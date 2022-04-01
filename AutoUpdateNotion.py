@@ -32,7 +32,10 @@ class Notion_Automation:
     def __init__(self):
         pass
     
+<<<<<<< HEAD
+=======
     # Closes Popups if they occur
+>>>>>>> 572dc86 (update)
     def closePopUps(driver):
         try:
             alert_obj = driver.switch_to.alert
@@ -40,7 +43,10 @@ class Notion_Automation:
         except:
             pass
         
+<<<<<<< HEAD
+=======
     # With 2 inputted time, it checks if the current time is between the inputted times
+>>>>>>> 572dc86 (update)
     def is_time_between(self, begin_time, end_time, check_time=None):
         # If check time is not given, default to current UTC time
         check_time = check_time or datetime.now().time()
@@ -49,6 +55,19 @@ class Notion_Automation:
         else: # crosses midnight
             return check_time >= begin_time or check_time <= end_time
     
+<<<<<<< HEAD
+    
+    def downloadCSV(self, driver):
+        # Click on the first "..." button on the evaluation page
+        WebDriverWait(driver,10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.notion-selectable.notion-collection_view-block')))
+        driver.find_elements_by_css_selector('.dots')[0].click()
+        element = driver.find_element_by_css_selector('.notion-selectable.notion-collection_view-block')
+        
+        # Hover over the menu to donwload
+        hover = ActionChains(driver).move_to_element(element)
+        hover.perform()
+=======
+>>>>>>> 572dc86 (update)
 
         
     def Update_Schedule(self, driver):                                                    
@@ -252,6 +271,31 @@ class Notion_Automation:
     
     def Notion_Evalpage_Update(self, driver):
         # Go to Evaluation Page
+<<<<<<< HEAD
+        driver.get("https://www.notion.so/andyhomepage/103aadb3035f470f88e33801328c0f34?v=d9973f85ed534a7cbab33b57e0645c3b")
+        time.sleep(4)
+    
+        try:
+            eval_page = driver.find_element_by_xpath('//*[@id="notion-app"]/div/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div/div[1]/div/div[2]/div/div')
+            if eval_page.text != 'Evaluation':    
+                ActionChains(driver).send_keys(Keys.ENTER)
+                time.sleep(4)
+                ActionChains(driver).send_keys(Keys.ENTER)
+                driver.get("https://www.notion.so/andyhomepage/103aadb3035f470f88e33801328c0f34?v=d9973f85ed534a7cbab33b57e0645c3b")
+                NAuto.downloadCSV()
+            else:
+                ActionChains(driver).send_keys(Keys.ENTER)
+                time.sleep(4)
+                ActionChains(driver).send_keys(Keys.ENTER)
+                NAuto.downloadCSV()
+    
+        except CE.UnexpectedAlertPresentException:
+            ActionChains(driver).send_keys(Keys.ENTER)
+            time.sleep(4)
+            ActionChains(driver).send_keys(Keys.ENTER)
+            driver.get("https://www.notion.so/andyhomepage/103aadb3035f470f88e33801328c0f34?v=d9973f85ed534a7cbab33b57e0645c3b")
+            NAuto.downloadCSV()
+=======
         evaluation_page_url = "https://www.notion.so/andyhomepage/103aadb3035f470f88e33801328c0f34?v=d9973f85ed534a7cbab33b57e0645c3b"
         driver.get(evaluation_page_url)
         time.sleep(4)
@@ -260,13 +304,18 @@ class Notion_Automation:
         time.sleep(4)
         ActionChains(driver).send_keys(Keys.ENTER)
         driver.get(evaluation_page_url)
+>>>>>>> 572dc86 (update)
             
     
     def Notion_Evalpage_exportCSV(self, driver):
         
+<<<<<<< HEAD
+        # Export CSV                                                                
+=======
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="notion-app"]/div/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[2]/div/div/div')))
         # Export CSV        
         driver.find_elements_by_css_selector('.dots')[0].click()                                                        
+>>>>>>> 572dc86 (update)
         WebDriverWait(driver,2.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="notion-app"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div/div[1]/div[3]/div[2]/div')))                         
         driver.find_element_by_xpath('//*[@id="notion-app"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div/div[1]/div[4]/div[1]/div').click()
         time.sleep(.8)               
