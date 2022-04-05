@@ -33,7 +33,7 @@ Recently, Notion has released its API that conveniently allows users to extract 
 ### 2. Update Today's Schedule
 There are approximately 50 weekly tasks in my To-do list database, which are divided into different categories(Programming, Classes, Job search, etc.).
 Since it would be tedious and redundant to reschedule these tasks every day, I have successfully written a Python script that schedules it for me.
-It goes through every block(task) in the database and organizes today's to-do lists. 
+It goes through every block(task) in the database and organizes today's to-do lists within seconds. 
 
 ### 3. Read & [Organize](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py) Evaluation Data 
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
