@@ -98,6 +98,12 @@ class Connect_Notion:
         year = date[-1][-2:]
         file_name = month + year + '.csv'
         eval_data.to_csv("C:\\NotionUpdate\progress\Data\%s" % file_name, index=False)
+        
+        # Download to my D drive if plugged in 
+        try:
+            eval_data.to_csv("D:\Personal\progress\Data\%s" % file_name, index=False)
+        except:
+            pass
             
         
         
@@ -178,7 +184,7 @@ class Connect_Notion:
             
             # However, if it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            if CNotion.is_time_between(time_time(8,00),time_time(21,59)) == True:
+            if CNotion.is_time_between(time_time(13,00),time_time(21,59)) == True:
                 return proj_data['Category_current'].count("Today")
             
             print("Updating Today's Schedule...")
