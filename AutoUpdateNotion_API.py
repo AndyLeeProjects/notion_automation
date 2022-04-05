@@ -80,6 +80,9 @@ class Connect_Notion:
                                     for i in range(len(data["results"]))]
                 proj_data["Category_current"] = [data['results'][i]['properties']['Status 1']['select']['name']
                                     for i in range(len(data["results"]))]
+            else:
+                pass
+                
 
         return proj_data
     
@@ -149,6 +152,21 @@ class Connect_Notion:
         
         response = requests.request("PATCH", updateUrl_to_waitlist, 
                                     headers=headers, data=json.dumps(updateData_to_waitlist))
+        
+    def updateNumber_of_todolist(self, pageId, headers, count_total_todo):
+        updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
+    
+        updateData_to_waitlist = {
+            "properties": {
+                "Total tasks": {
+                    "number": count_total_todo
+                }        
+            }
+        }
+        
+        
+        response = requests.request("PATCH", updateUrl_to_waitlist, 
+                                    headers=headers, data=json.dumps(updateData_to_waitlist))
                     
         
     def update_TodoList(self, proj_data):
@@ -156,23 +174,35 @@ class Connect_Notion:
         today = CNotion.get_today("day")
         today_date = CNotion.get_today("date")
         
+        count_total_todo = []
         for block in range(len(proj_data['Name'])):
+            
+            # Count the total number of Today's todo lists
+            if proj_data['Category_current'][block] == "Today":
+                count_total_todo.append(1)
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
                 # 2 CASES that requires adjustment
                     # CASE 1: the block is NOT in Today column when it should be
                     # CASE 2: the block is in Today clumn wht it should NOT be
             # Check CASE 1
+            
             if today in proj_data["Date"][block]:
-                if proj_data["Category_current"] != "Today":
+                #print(proj_data['Category'][block], proj_data['Name'][block])
+                ##print(today, proj_data['Date'][block])
+                #print()
+                if proj_data["Category_current"][block] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
+                    count_total_todo.append(1)
                 
             # Check CASE 2
                 # If the block is incorrectly in Today's column send it back to its category(column)
             else:
-                if proj_data["Category_current"] == "Today":
+                
+                if proj_data["Category_current"][block] == "Today":
                     CNotion.updateTask_to_others(proj_data["pageId"][block], headers,
                                                  proj_data["Category"][block])
+                    count_total_todo.pop(-1)
             
             # Same procedure for today's Date
             
@@ -180,16 +210,16 @@ class Connect_Notion:
             if today_date == proj_data["Due Date"][block]:
                 if proj_data["Category_current"] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
+                    count_total_todo.append(1)
                 
             # Check CASE 2
                 # If the block is incorrectly in Today's column send it back to its category(column)
             else:
-                if proj_data["Category_current"] == "Today":
-                    CNotion.updateTask_to_others(proj_data["pageId"][block], headers,
-                                                 proj_data["Category"][block])
+                pass
         
         print("Completed")
         print()
+        return len(count_total_todo)
     
     def update_evaluationJPG(self):
         print("Uploading evaluation.jpg file...")
@@ -222,12 +252,16 @@ headers = {
     "Notion-Version": "2021-05-13"
 }
     
+# Schedule my tasks 
 CNotion = Connect_Notion()
 data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 proj_data = CNotion.get_projects_data(data, projects)
-CNotion.update_TodoList(proj_data)
-    
+count_total_todo = CNotion.update_TodoList(proj_data)
+
+# Update the Total number of todo lists
+pageId = secret.total_todolists("pageId")
+CNotion.updateNumber_of_todolist(pageId, headers, count_total_todo)
 
 # Read Evaluation Database in Notion using different database ID
 databaseId = secret.evaluation_db("DATABASE_ID")
@@ -236,7 +270,10 @@ data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 eval_data = CNotion.get_evaluation_data(data, projects)
 
+# Download the evaluationd ata
 CNotion.download_evaluationCSV(eval_data)
+
+# Upload Evaluation Visualization 
 CNotion.update_evaluationJPG()
 
 
