@@ -10,6 +10,7 @@ from datetime import datetime
 import sys
 import calendar
 import pandas as pd
+from datetime import time as time_time
 sys.path.append('C:\\NotionUpdate\\progress')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
@@ -170,16 +171,17 @@ class Connect_Notion:
                     
         
     def update_TodoList(self, proj_data):
-        print("Updating Today's Schedule...")
         today = CNotion.get_today("day")
         today_date = CNotion.get_today("date")
         
-        count_total_todo = []
         for block in range(len(proj_data['Name'])):
             
-            # Count the total number of Today's todo lists
-            if proj_data['Category_current'][block] == "Today":
-                count_total_todo.append(1)
+            # However, if it's past 1:00 pm, don't reschedule it again
+                # Since I may have made some modifications, which needs to be fixed
+            if CNotion.is_time_between(time_time(8,00),time_time(21,59)) == True:
+                return proj_data['Category_current'].count("Today")
+            
+            print("Updating Today's Schedule...")
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
                 # 2 CASES that requires adjustment
@@ -193,7 +195,6 @@ class Connect_Notion:
                 #print()
                 if proj_data["Category_current"][block] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
-                    count_total_todo.append(1)
                 
             # Check CASE 2
                 # If the block is incorrectly in Today's column send it back to its category(column)
@@ -202,7 +203,6 @@ class Connect_Notion:
                 if proj_data["Category_current"][block] == "Today":
                     CNotion.updateTask_to_others(proj_data["pageId"][block], headers,
                                                  proj_data["Category"][block])
-                    count_total_todo.pop(-1)
             
             # Same procedure for today's Date
             
@@ -210,7 +210,6 @@ class Connect_Notion:
             if today_date == proj_data["Due Date"][block]:
                 if proj_data["Category_current"] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
-                    count_total_todo.append(1)
                 
             # Check CASE 2
                 # If the block is incorrectly in Today's column send it back to its category(column)
@@ -219,7 +218,9 @@ class Connect_Notion:
         
         print("Completed")
         print()
-        return len(count_total_todo)
+        
+        # Return the total number of today's todo lists
+        return proj_data['Category_current'].count("Today")
     
     def update_evaluationJPG(self):
         print("Uploading evaluation.jpg file...")
@@ -239,6 +240,15 @@ class Connect_Notion:
         NAPI.uploadEvaluationJPG()
         print('Completed')
         print()
+    
+    def is_time_between(self, begin_time, end_time, check_time=None):
+        # If check time is not given, default to current UTC time
+        check_time = check_time or datetime.now().time()
+        if begin_time < end_time:
+            return check_time >= begin_time and check_time <= end_time
+        else: # crosses midnight
+            return check_time >= begin_time or check_time <= end_time
+    
         
         
 
@@ -257,6 +267,7 @@ CNotion = Connect_Notion()
 data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 proj_data = CNotion.get_projects_data(data, projects)
+
 count_total_todo = CNotion.update_TodoList(proj_data)
 
 # Update the Total number of todo lists
@@ -270,7 +281,7 @@ data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 eval_data = CNotion.get_evaluation_data(data, projects)
 
-# Download the evaluationd ata
+# Download the evaluation data
 CNotion.download_evaluationCSV(eval_data)
 
 # Upload Evaluation Visualization 
