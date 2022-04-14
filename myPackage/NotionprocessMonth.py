@@ -12,6 +12,7 @@ if os.name == 'posix':
     sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
 else:
     sys.path.append('C:\\NotionUpdate\progress\myPackage')
+import NotionprocessCorr as pCor
 import NotionprocessReadData as pRd
 import std_risetime as srt
 import time
@@ -255,7 +256,16 @@ def monthly_eval(mon):
             pass
         
         
+    # Streaks
+        # if input month is not a current month, don't apply streak
+        # if the streak is 0, don't apply streak
     try:
+        '''
+        Cdate = mon['Date'][0][0:3].strip('/\"0')
+        today = datetime.today()
+        if int(Cdate) != today.month:
+            pass
+        '''
         Rstreak, Tstreak, avg_3, tt_3 = wakeupStreak() 
         tt_3 = int(tt_3)
         # - Rise time streak
@@ -308,6 +318,12 @@ def monthly_eval(mon):
             axe[0].text(date_x[j], round(tt[j]*100,2)+5.7 ,events[j],horizontalalignment = 'center',color = 'blue' ,fontsize=7.5, alpha=.7)
         except:
             pass
+        #if len(tt) > 27:    # Over 27 days could make the graph cramp
+        #    if tt[-1] == tt[j]:
+        #        axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
+        #    elif np.abs(tt[j+1]-tt[j]) > 0.015:
+        #        axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
+        #else:    
         axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
         
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])

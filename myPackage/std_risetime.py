@@ -66,19 +66,6 @@ def rise_time_adjustment(dat, changed_occurence):
 
 
 
-#%%
-import pandas as pd
-import numpy as np
-a = pd.read_csv(r'C:\Users\anddy\OneDrive\Desktop\surusuru\flight_crashes_MS.csv')
-
-# how to omit na in pandas dataframe
-a = a.dropna(axis = 0, how ='any', thresh = None, subset = None, inplace=False)
-
-# split & strip functions
-
-
-
-
 
 
 

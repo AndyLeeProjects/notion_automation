@@ -71,6 +71,7 @@ class read_data():
         months_key = []
         while True:
             try:
+                
                 if month == 13:
                     month = 1
                     year += 1
@@ -79,15 +80,27 @@ class read_data():
                 
                 break
             month += 1
-        all_dat = pCor.CorSetUp(months_key, purpose)
+        all_dat = pd.DataFrame(pCor.CorSetUp(months_key, purpose))
+        
         return all_dat, months_key
+    
+    def save_to_Ddrive(self, all_dat):
+        # Save the data in the D drive for further statistical analysis
+        try:
+            all_dat.to_csv(r'D:\Spring 2022\Project\all_dat.csv')
+            print("all_dat.csv saved to D Drive")
+            print()
+        except:
+            pass
             
                 
-                
 
-mon = read_data()
-month = mon.monthly(4,22)
-all_data = mon.all_data('include date')[0]
-months_key = mon.all_data('include date')[1]
+
+
+
+
+
+
+
 
 

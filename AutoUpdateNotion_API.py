@@ -16,6 +16,7 @@ from secret import secret
 from myPackage import organize_evaluation_data as oed
 from Connect_NotionAPI import NotionUpdate_API as NAPI
 from myPackage import NotionprocessMonth as pMon
+from myPackage import NotionprocessReadData as NRD
 
 
 class Connect_Notion:
@@ -38,7 +39,14 @@ class Connect_Notion:
     def get_projects_titles(self,data_json):
         most_properties = [len(data_json['results'][i]['properties'])
                                 for i in range(len(data_json["results"]))]
-        return list(data_json["results"][np.argmax(most_properties)]["properties"].keys())+['pageId']
+        
+        project_keys = list(data_json["results"][np.argmax(most_properties)]["properties"].keys()) 
+        
+        # since we are using 2 different data sets for the same code
+        if "Due Date" not in project_keys and "Meditation (%)" not in project_keys:
+            return project_keys + ["Due Date","pageId"]
+        else:
+            return project_keys + ["pageId"]
     
     
     def get_projects_data(self, data, projects):
@@ -246,6 +254,14 @@ class Connect_Notion:
         NAPI.uploadEvaluationJPG()
         print('Completed')
         print()
+        
+        # Save to D Drive (if plugged in) for further statistical analysis
+        RDATA = NRD.read_data()
+        all_dat = RDATA.all_data("include date")[0]
+        RDATA.save_to_Ddrive(all_dat)
+
+
+        
     
     def is_time_between(self, begin_time, end_time, check_time=None):
         # If check time is not given, default to current UTC time
