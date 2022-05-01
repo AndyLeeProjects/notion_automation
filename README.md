@@ -18,7 +18,7 @@ Through this project and daily evaluation, I was able to analyze the strengths a
 <br>  
 More information can be found in below links:
 - [My Website](https://www.andyleeproject.com/)
-- [Statistical Analysis of the lifestyle data using R (IN PROGRESS)](https://alin-96.github.io/)
+- [Statistical Analysis of the lifestyle data using R (IN PROGRESS)](https://alin-96.github.io/selfeval_main.html)
 
 
 
