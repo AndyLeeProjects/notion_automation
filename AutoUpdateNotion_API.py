@@ -11,7 +11,11 @@ import sys
 import calendar
 import pandas as pd
 from datetime import time as time_time
-sys.path.append('C:\\NotionUpdate\\progress')
+import os
+if os.name == 'posix':
+    sys.path.append('/Volumes/Programming/Personal/progress')
+else:
+    sys.path.append('D:\Personal\progress')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
 from Connect_NotionAPI import NotionUpdate_API as NAPI
