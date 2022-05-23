@@ -17,6 +17,10 @@ from myPackage import organize_evaluation_data as oed
 from Connect_NotionAPI import NotionUpdate_API as NAPI
 from myPackage import NotionprocessMonth as pMon
 from myPackage import NotionprocessReadData as NRD
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
 
 
 class Connect_Notion:
@@ -83,8 +87,13 @@ class Connect_Notion:
                                     for i in range(len(data["results"]))]
             
             elif p == "Name":
-                proj_data["Name"] = [data['results'][i]['properties']['Name']['title'][0]['text']['content'].split(': ')[1]
-                                    for i in range(len(data["results"]))]
+                names = []
+                for i in range(len(data["results"])):
+                    try:
+                        names.append(data['results'][i]['properties']['Name']['title'][0]['text']['content'].split(': ')[1])
+                    except:
+                        names.append(data['results'][i]['properties']['Name']['title'][0]['text']['content'])
+                proj_data["Name"] = names
                 proj_data["Category"] = [data['results'][i]['properties']['Name']['title'][0]['text']['content'].split(': ')[0]
                                     for i in range(len(data["results"]))]
                 proj_data["Category_current"] = [data['results'][i]['properties']['Status 1']['select']['name']
@@ -168,70 +177,53 @@ class Connect_Notion:
         response = requests.request("PATCH", updateUrl_to_waitlist, 
                                     headers=headers, data=json.dumps(updateData_to_waitlist))
         
-    def updateNumber_of_todolist(self, pageId, headers, count_total_todo):
-        updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
-    
-        updateData_to_waitlist = {
-            "properties": {
-                "Total tasks": {
-                    "number": count_total_todo
-                }        
-            }
-        }
-        
-        
-        response = requests.request("PATCH", updateUrl_to_waitlist, 
-                                    headers=headers, data=json.dumps(updateData_to_waitlist))
-                    
         
     def update_TodoList(self, proj_data):
         today = CNotion.get_today("day")
         today_date = CNotion.get_today("date")
         
+        print("Updating Today's Schedule...\n")
         for block in range(len(proj_data['Name'])):
             
-            # However, if it's past 1:00 pm, don't reschedule it again
+            # If it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            if CNotion.is_time_between(time_time(13,00),time_time(21,59)) == True:
-                return proj_data['Category_current'].count("Today")
+            # if CNotion.is_time_between(time_time(13,00),time_time(21,59)) == True:
+            #    return proj_data['Category_current'].count("Today")
             
-            print("Updating Today's Schedule...")
+            
+            
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
                 # 2 CASES that requires adjustment
-                    # CASE 1: the block is NOT in Today column when it should be
-                    # CASE 2: the block is in Today clumn wht it should NOT be
+                    # CASE 1: the block is NOT in Today column when it should be (Days)
+                    # CASE 2: the block is in Today column wht it should NOT be  (Days)
+                    # CASE 3: the block is NOT in Today column when it should be (Date)
+                    
             # Check CASE 1
-            
             if today in proj_data["Date"][block]:
-                #print(proj_data['Category'][block], proj_data['Name'][block])
-                ##print(today, proj_data['Date'][block])
-                #print()
                 if proj_data["Category_current"][block] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
-                
+                    print("[%s] Block Updated" % proj_data["Name"][block])
+
             # Check CASE 2
-                # If the block is incorrectly in Today's column send it back to its category(column)
+            # If the block is incorrectly in Today's column send it back to its category(column)
             else:
+                # disposable blocks(Used for one day: popped up meeting or laundry etc.)
+                if proj_data['Date'][block] == [] and proj_data['Due Date'][block] == 0:
+                    pass
                 
-                if proj_data["Category_current"][block] == "Today":
+                elif proj_data["Category_current"][block] == "Today":
                     CNotion.updateTask_to_others(proj_data["pageId"][block], headers,
                                                  proj_data["Category"][block])
+                    print("[%s] Block Updated" % proj_data["Name"][block])
             
-            # Same procedure for today's Date
-            
-            # Check CASE 1
+            # Check CASE 3
             if today_date == proj_data["Due Date"][block]:
                 if proj_data["Category_current"] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
-                
-            # Check CASE 2
-                # If the block is incorrectly in Today's column send it back to its category(column)
-            else:
-                pass
+                    print("[%s] Block Updated" % proj_data["Name"][block])
         
-        print("Completed")
-        print()
+        print("\nUpdate Complete\n")
         
         # Return the total number of today's todo lists
         return proj_data['Category_current'].count("Today")
@@ -272,9 +264,6 @@ class Connect_Notion:
             return check_time >= begin_time or check_time <= end_time
     
         
-        
-
-        
     
 databaseId = secret.todo_db("DATABASE_ID")
 token = secret.notion_API("token_key")
@@ -290,11 +279,6 @@ data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 proj_data = CNotion.get_projects_data(data, projects)
 
-count_total_todo = CNotion.update_TodoList(proj_data)
-
-# Update the Total number of todo lists
-pageId = secret.total_todolists("pageId")
-CNotion.updateNumber_of_todolist(pageId, headers, count_total_todo)
 
 # Read Evaluation Database in Notion using different database ID
 databaseId = secret.evaluation_db("DATABASE_ID")
