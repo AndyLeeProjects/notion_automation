@@ -11,11 +11,7 @@ import sys
 import calendar
 import pandas as pd
 from datetime import time as time_time
-import os
-if os.name == 'posix':
-    sys.path.append('/Volumes/Programming/Personal/progress')
-else:
-    sys.path.append('D:\Personal\progress')
+sys.path.append('C:\\NotionUpdate\\progress')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
 from Connect_NotionAPI import NotionUpdate_API as NAPI
@@ -30,7 +26,8 @@ warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 class Connect_Notion:
     def __init__(self):
         pass    
-
+    
+    # Retrieve Database from Notion
     def read_Database(self, databaseId, headers):
         readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
     
@@ -44,6 +41,7 @@ class Connect_Notion:
         return data
     
     
+    # Organize & Convert JSON format into dictionary
     def get_projects_titles(self,data_json):
         most_properties = [len(data_json['results'][i]['properties'])
                                 for i in range(len(data_json["results"]))]
@@ -108,11 +106,14 @@ class Connect_Notion:
 
         return proj_data
     
+    
+    # Get Evaluation Data from a separate database 
     def get_evaluation_data(self, data, projects):
         projects.pop(-1)        
         eval_data = oed.get_evaluation_data(projects, data)
         return eval_data
     
+    # Overwrite the existing excel file with an updated data
     def download_evaluationCSV(self, eval_data):
         date = eval_data['Date'][0].split('/')
         month = date[0]
@@ -126,8 +127,6 @@ class Connect_Notion:
         except:
             pass
             
-        
-        
     def get_today(self, key):
         # Get today's date
         week_days = ['Mon','Tue','Wed','Thur','Fri','Sat','Sun']
@@ -144,7 +143,8 @@ class Connect_Notion:
             return today
         else:
             return dt_string
-        
+    
+    # Update a block(task) to today's column
     def updateTask_to_today(self, pageId, headers):
         updateUrl_to_next = f"https://api.notion.com/v1/pages/{pageId}"
     
@@ -163,6 +163,7 @@ class Connect_Notion:
         response = requests.request("PATCH", updateUrl_to_next, 
                                     headers=headers, data=json.dumps(updateData_to_next))
     
+    # Update a block(task) from today's column to corresponding columns
     def updateTask_to_others(self, pageId, headers, category):
         updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
     
@@ -181,8 +182,8 @@ class Connect_Notion:
         response = requests.request("PATCH", updateUrl_to_waitlist, 
                                     headers=headers, data=json.dumps(updateData_to_waitlist))
         
-        
-    def update_TodoList(self, proj_data):
+    # Update Schedule
+    def update_Schedule(self, proj_data):
         today = CNotion.get_today("day")
         today_date = CNotion.get_today("date")
         
@@ -191,10 +192,8 @@ class Connect_Notion:
             
             # If it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            # if CNotion.is_time_between(time_time(13,00),time_time(21,59)) == True:
+            #if CNotion.is_time_between(time_time(13,00),time_time(21,59)) == True:
             #    return proj_data['Category_current'].count("Today")
-            
-            
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
@@ -227,7 +226,7 @@ class Connect_Notion:
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
                     print("[%s] Block Updated" % proj_data["Name"][block])
         
-        print("\nUpdate Complete\n")
+        print("\nUpdate Complete\n\n\n")
         
         # Return the total number of today's todo lists
         return proj_data['Category_current'].count("Today")
@@ -283,6 +282,8 @@ data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 proj_data = CNotion.get_projects_data(data, projects)
 
+# Update Schedule
+CNotion.update_Schedule(proj_data)
 
 # Read Evaluation Database in Notion using different database ID
 databaseId = secret.evaluation_db("DATABASE_ID")
@@ -290,6 +291,7 @@ CNotion = Connect_Notion()
 data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data)
 eval_data = CNotion.get_evaluation_data(data, projects)
+
 
 # Download the evaluation data
 CNotion.download_evaluationCSV(eval_data)
