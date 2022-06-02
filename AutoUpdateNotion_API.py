@@ -4,6 +4,7 @@ Created on Sat Apr  2 00:48:06 2022
 
 @author: anddy
 """
+import os
 import requests, json
 import numpy as np
 from datetime import datetime
@@ -139,10 +140,19 @@ class Connect_Notion:
         now = datetime.today()
         dt_string = now.strftime("%Y-%m-%d")
         
+        # Determine if today is weekday
+        if week_day_num > 4:
+            weekday = None
+        else:
+            weekday = 'Weekday'
+        
         if key == "day":
             return today
+        elif key == "weekday":
+            return weekday
         else:
             return dt_string
+        
     
     # Update a block(task) to today's column
     def updateTask_to_today(self, pageId, headers):
@@ -186,6 +196,7 @@ class Connect_Notion:
     def update_Schedule(self, proj_data):
         today = CNotion.get_today("day")
         today_date = CNotion.get_today("date")
+        weekday = CNotion.get_today("weekday")
         
         print("Updating Today's Schedule...\n")
         for block in range(len(proj_data['Name'])):
@@ -197,13 +208,15 @@ class Connect_Notion:
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
-                # 2 CASES that requires adjustment
+                # 3 CASES that requires adjustment
                     # CASE 1: the block is NOT in Today column when it should be (Days)
                     # CASE 2: the block is in Today column wht it should NOT be  (Days)
                     # CASE 3: the block is NOT in Today column when it should be (Date)
                     
+            
             # Check CASE 1
-            if today in proj_data["Date"][block]:
+            block_dates = proj_data["Date"][block]
+            if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
                 if proj_data["Category_current"][block] != "Today":
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
                     print("[%s] Block Updated" % proj_data["Name"][block])
