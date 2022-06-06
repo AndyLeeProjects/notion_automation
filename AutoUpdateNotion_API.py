@@ -10,10 +10,13 @@ from datetime import datetime
 import sys
 import calendar
 import pandas as pd
+from datetime import time as time_time
+
 sys.path.append('C:\\NotionUpdate\\progress')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
 from Connect_NotionAPI import NotionUpdate_API as NAPI
+from Connect_NotionAPI import change_background as cb
 from myPackage import NotionprocessMonth as pMon
 from myPackage import NotionprocessReadData as NRD
 import warnings
@@ -39,7 +42,6 @@ class Connect_Notion:
         
         return data
     
-    
     # Organize & Convert JSON format into dictionary
     def get_projects_titles(self,data_json, database_name):
         most_properties = [len(data_json['results'][i]['properties'])
@@ -57,13 +59,9 @@ class Connect_Notion:
             else:
                 return project_keys + ["pageId"]
         else:
-            project_keys = project_keys + ['pageId']
-            if 'Duration_EST' not in project_keys:
-                return project_keys + ["Duration_EST"]
-            elif 'D_Tasks' not in project_keys:
-                return project_keys + ['D_tasks']
-            else:
-                return project_keys + ["Duration_EST", "D_tasks"]
+            return  ['Duration_EST', 'D_Tasks', 'D_Title', 'pageId']
+            
+                
     
     def get_projects_data(self, data, projects):
         proj_data = {}
@@ -176,7 +174,7 @@ class Connect_Notion:
             eval_data.to_csv("D:\Personal\progress\Data\%s" % file_name, index=False)
         except:
             pass
-        print('Completed\n')
+        print('Completed\n\n')
             
         
     def get_today(self, key):
@@ -207,44 +205,40 @@ class Connect_Notion:
     
     # Update a block(task) to today's column
     def updateTask_to_today(self, pageId, headers):
-        updateUrl_to_next = f"https://api.notion.com/v1/pages/{pageId}"
+        path = f"https://api.notion.com/v1/pages/{pageId}"
     
         updateData_to_next = {
             "properties": {
                 "Status 1": {
-                    "select": 
-                        {
+                    "select": {
                                 "name": "Today"
                         }
-                }        
+                    }        
+                }
             }
-        }
         
-        
-        response = requests.request("PATCH", updateUrl_to_next, 
+        response = requests.request("PATCH", path, 
                                     headers=headers, data=json.dumps(updateData_to_next))
     
     # Update a block(task) from today's column to corresponding columns
     def updateTask_to_others(self, pageId, headers, category):
-        updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
+        path = f"https://api.notion.com/v1/pages/{pageId}"
     
         updateData_to_waitlist = {
             "properties": {
                 "Status 1": {
-                    "select": 
-                        {
+                    "select": {
                                 "name": category
                         }
-                }        
+                    }        
+                }
             }
-        }
         
-        
-        response = requests.request("PATCH", updateUrl_to_waitlist, 
+        response = requests.request("PATCH", path, 
                                     headers=headers, data=json.dumps(updateData_to_waitlist))
     
     def updateDuration_EST(self, pageId, headers, duration):
-        updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
+        path = f"https://api.notion.com/v1/pages/{pageId}"
     
         updateDuration_EST = {
             "properties": {
@@ -258,23 +252,21 @@ class Connect_Notion:
             }
         }
         
-        
-        response = requests.request("PATCH", updateUrl_to_waitlist, 
+        response = requests.request("PATCH", path, 
                                     headers=headers, data=json.dumps(updateDuration_EST)) 
 
     def updateDuration_Tasks(self, pageId, headers, tasks):
-        updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
+        path = f"https://api.notion.com/v1/pages/{pageId}"
     
         updateDuration_Tasks = {
             "properties": {
                 "D_Tasks": {
                     "number": tasks
-                }        
-            }
-        }
+                        }        
+                    }
+                }
         
-        
-        response = requests.request("PATCH", updateUrl_to_waitlist, 
+        response = requests.request("PATCH", path, 
                                     headers=headers, data=json.dumps(updateDuration_Tasks)) 
 
 
@@ -289,8 +281,8 @@ class Connect_Notion:
             
             # If it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            #if CNotion.is_time_between(time_time(13,00),time_time(21,59)) == True:
-            #    return proj_data['Category_current'].count("Today")
+            if CNotion.is_time_between(time_time(13,00),time_time(23,59)) == True:
+                return proj_data['Category_current'].count("Today")
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
@@ -331,6 +323,7 @@ class Connect_Notion:
         return proj_data['Category_current'].count("Today")
     
     def get_DurationTime_EST(self, proj_data):
+        print('Updating Druation Database...')
         # Get 3 values
             # 1. Total Task Duration EST   AND   Total num of Tasks
             # 2. Finished Task Druation    AND   Total num of Finished Tasks
@@ -362,9 +355,9 @@ class Connect_Notion:
                     rem_numTasks.append(task)
         
         # Change Duration EST values into easier []hr []min format
-        tot_durationEST = "%dhr %dmin" % (tot_durationEST//60, tot_durationEST%60)
-        fin_durationEST = "%dhr %dmin" % (fin_durationEST//60, fin_durationEST%60)
-        rem_durationEST = "%dhr %dmin" % (rem_durationEST//60, rem_durationEST%60)
+        tot_durationEST = "%dhr %dmin" % (tot_durationEST // 60, tot_durationEST % 60)
+        fin_durationEST = "%dhr %dmin" % (fin_durationEST // 60, fin_durationEST % 60)
+        rem_durationEST = "%dhr %dmin" % (rem_durationEST // 60, rem_durationEST % 60)
         
         # Make it into a dictionary for convenience
         duration_dic = {'tot_durationEST':tot_durationEST,
@@ -382,7 +375,7 @@ class Connect_Notion:
             if D_proj_data['D_Title'][row] == "Total Work Hours EST":
                 CNotion.updateDuration_EST(D_proj_data['pageId'][row], 
                                            headers, 
-                                           duration_dic['tot_durationEST'])        
+                                           duration_dic['tot_durationEST'])
                 CNotion.updateDuration_Tasks(D_proj_data['pageId'][row], 
                                            headers, 
                                            duration_dic['tot_numTasks'])     
@@ -400,7 +393,8 @@ class Connect_Notion:
                                            duration_dic['rem_durationEST'])        
                 CNotion.updateDuration_Tasks(D_proj_data['pageId'][row], 
                                            headers, 
-                                           duration_dic['rem_numTasks'])        
+                                           duration_dic['rem_numTasks'])       
+        print('Completed\n\n')
                 
     def update_evaluationJPG(self):
         print("Uploading evaluation.jpg file...")
@@ -416,10 +410,10 @@ class Connect_Notion:
                                        'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups'})
 
         # Monthly Evaluation Plot
-        pMon.monthly_eval(projects_data_eval) # Replace it with projects_data_eval
-        NAPI.uploadEvaluationJPG()
-        print('Completed')
-        print()
+        pMon.monthly_eval(projects_data_eval, update_window = True) # Replace it with projects_data_eval
+        cb.update_Background() # Change the windows background with the self-evaluation IMG 
+        #NAPI.uploadEvaluationJPG()
+        print('Completed\n\n')
         
         # Save to D Drive (if plugged in) for further statistical analysis
         RDATA = NRD.read_data()
@@ -466,6 +460,7 @@ eval_data = CNotion.get_evaluation_data(data, projects)
 duration_dic = CNotion.get_DurationTime_EST(proj_data)
 databaseId = secret.durationTime_EST("DATABASE_ID")
 D_proj_data = CNotion.connect_DB("Duration Database")
+
 # Update Duration Database
 CNotion.update_DurationDB(duration_dic,D_proj_data)
 
