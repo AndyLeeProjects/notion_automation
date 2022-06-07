@@ -63,7 +63,7 @@ Using the Notion API, I can directly upload an image from Python. Thus, the crea
 ### 7. Task Schedular
 Using the built-in task schedular feature in Windows, I have set up for the Python script to run two times a day. 
 The script will run for the first time whenever I log in to my laptop and also at 9:00 pm for the second time.
-
+ 
 
 
 
