@@ -288,8 +288,8 @@ class Connect_Notion:
             
             # If it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            #if CNotion.is_time_between(time_time(13,00),time_time(23,59)) == True:
-            #    return proj_data['Category_current'].count("Today")
+            if CNotion.is_time_between(time_time(13,00),time_time(23,59)) == True:
+                return proj_data['Category_current'].count("Today")
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
