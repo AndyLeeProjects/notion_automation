@@ -20,10 +20,17 @@ More information can be found in below links:
 - [My Website](https://www.andyleeproject.com/)
 - [Statistical Analysis of the lifestyle data using R (IN PROGRESS)](https://alin-96.github.io/selfeval_main.html)
 
+ <br>  
+ <br>  
+ 
+## Automation Python Script  
 
+https://user-images.githubusercontent.com/84836749/172453935-355dff09-d834-4038-a430-207adfeffeb0.mp4
 
 
 <br>  
+<br>  
+
 
 ## AutoUpdateNotion_API.py [(See file)](https://github.com/aLin-96/notion_automation/blob/main/AutoUpdateNotion_API.py)
 
