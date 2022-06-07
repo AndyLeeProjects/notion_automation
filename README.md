@@ -38,7 +38,7 @@ It goes through every block(task) in the database and organizes today's to-do li
 ### 3. Update Duration Database in Notion
 The duration database demonstrates the total expected work hours and how many hours I have completed throughout the day. For each task, there is an Estimated duration tag (ex. Study Statistics - 1hr) that I can assign accordingly. Then these estimations are hourly imported to Python to compute & update the total, completed, and remaining hours using Notion API. The purpose of estimating duration time is to handle and use the given time more efficiently.   
 
-<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/Duration_DB_sample.jpg" width="700" height="250" >
+<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/Duration_DB_sample.jpg" width="900" height="200" >
 
 ### 4. Read & [Organize](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py) Evaluation Data 
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
