@@ -120,7 +120,10 @@ class Connect_Notion:
             elif p == "D_Tasks":
                 task_temp = []
                 for i in range(len(data["results"])):
-                    task_temp.append(data['results'][i]['properties'][p]['number'])
+                    try:
+                        task_temp.append(data['results'][i]['properties'][p]['number'])
+                    except:
+                        task_temp.append(0)
                 proj_data[p] = task_temp 
                                     
             # Organize the duration data for each task/ block
@@ -170,7 +173,7 @@ class Connect_Notion:
         year = date[-1][-2:]
         file_name = month + year + '.csv'
         
-        print('\nUpdate Evaluation CSV Data...')
+        print('\n****************** Update Evaluation CSV Data ******************')
         
         eval_data.to_csv("C:\\NotionUpdate\progress\Data\%s" % file_name, index=False)
         # Download to my D drive if plugged in 
@@ -178,7 +181,7 @@ class Connect_Notion:
             eval_data.to_csv("D:\Personal\progress\Data\%s" % file_name, index=False)
         except:
             pass
-        print('Completed\n\n')
+        print('Update Completed\n\n')
             
         
     def get_today(self, key):
@@ -280,13 +283,13 @@ class Connect_Notion:
         today_date = CNotion.get_today("date")
         weekday = CNotion.get_today("weekday")
         
-        print("Updating Today's Schedule...\n")
+        print("****************** Updating Today's Schedule ******************")
         for block in range(len(proj_data['Name'])):
             
             # If it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            if CNotion.is_time_between(time_time(13,00),time_time(23,59)) == True:
-                return proj_data['Category_current'].count("Today")
+            #if CNotion.is_time_between(time_time(13,00),time_time(23,59)) == True:
+            #    return proj_data['Category_current'].count("Today")
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
@@ -321,13 +324,13 @@ class Connect_Notion:
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
                     print("[%s] Block Updated" % proj_data["Name"][block])
         
-        print("\nUpdate Complete\n\n\n")
+        print("\nUpdate Complete\n\n")
         
         # Return the total number of today's todo lists
         return proj_data['Category_current'].count("Today")
     
     def get_DurationTime_EST(self, proj_data):
-        print('Updating Druation Database...')
+        print('****************** Updating Duration Database ******************')
         # Get 3 values
             # 1. Total Task Duration EST   AND   Total num of Tasks
             # 2. Finished Task Druation    AND   Total num of Finished Tasks
@@ -339,6 +342,7 @@ class Connect_Notion:
         fin_numTasks = []
         rem_durationEST = 0
         rem_numTasks = []
+        print("Calculating Durations...")
         for task in range(len(proj_data['To do'])):
             task_duration = proj_data['Duration_EST'][task]
             task_status = proj_data['To do'][task]
@@ -373,7 +377,7 @@ class Connect_Notion:
         return duration_dic
     
     def update_DurationDB(self, duration_dic, D_proj_data):
-        
+        print("Uploading to Duration DB...")
         # Update Total, Finished, Remaining Durations & Tasks for Today
         for row in range(3):
             if D_proj_data['D_Title'][row] == "Total Work Hours EST":
@@ -398,10 +402,10 @@ class Connect_Notion:
                 CNotion.updateDuration_Tasks(D_proj_data['pageId'][row], 
                                            headers, 
                                            duration_dic['rem_numTasks'])       
-        print('Completed\n\n')
+        print('Update Completed\n\n')
                 
     def update_evaluationJPG(self):
-        print("Uploading evaluation.jpg file...")
+        print("****************** Uploading evaluation.jpg file ******************")
         data_eval = NAPI.nsync.query_databases()
         projects_eval = NAPI.nsync.get_projects_titles(data_eval)
         projects_data_eval = pd.DataFrame(NAPI.nsync.get_projects_data(data_eval,projects_eval))
@@ -417,7 +421,7 @@ class Connect_Notion:
         pMon.monthly_eval(projects_data_eval, update_window = True) # Replace it with projects_data_eval
         cb.update_Background() # Change the windows background with the self-evaluation IMG 
         #NAPI.uploadEvaluationJPG()
-        print('Completed\n\n')
+        print('Upload Completed\n\n')
         
         # Save to D Drive (if plugged in) for further statistical analysis
         RDATA = NRD.read_data()
@@ -461,6 +465,11 @@ projects = CNotion.get_projects_titles(data, "Task Database")
 eval_data = CNotion.get_evaluation_data(data, projects)
 
 # Update Total Duration Estimate Database
+# Reconnect to get updated database
+databaseId = secret.todo_db("DATABASE_ID")
+CNotion = Connect_Notion()
+proj_data = CNotion.connect_DB("Task Database")
+# Update Duration_DB
 duration_dic = CNotion.get_DurationTime_EST(proj_data)
 databaseId = secret.durationTime_EST("DATABASE_ID")
 D_proj_data = CNotion.connect_DB("Duration Database")
