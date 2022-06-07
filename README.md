@@ -9,7 +9,7 @@ It has indeed been a wonderful experience using Notion, and because of it, I was
 However, when I was using the platform a few years ago, I have realized that I go through many redundant motions in Notion throughout the day that I could easily automate using Python. 
 Thus, I decided to do so by utilizing the Notion API. 
 <br>  
-Also, before demonstrating a brief explanation of the automation process, understanding my **self-evaluation** project will help better understand the purpose of the automation.
+Also, before demonstrating a brief explanation of the automation process, understanding my **self-evaluation** project will help grok the purpose of the automation.
 For more than 500 days, I have [evaluated and recorded](https://github.com/aLin-96/notion_automation/tree/main/Data) my day-to-day life in the Notion database. 
 The general idea is to quantify my daily habits, which are converted to percentages using various mathematical models to approximate the total score of how I lived each day. 
 One may think of it as a grading system of my lifestyle.
