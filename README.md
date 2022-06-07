@@ -25,7 +25,10 @@ More information can be found in below links:
  
 ## Automation Python Script Sample (No Sound)
 
-https://user-images.githubusercontent.com/84836749/172453935-355dff09-d834-4038-a430-207adfeffeb0.mp4
+
+
+https://user-images.githubusercontent.com/84836749/172465933-55117519-cd91-4a19-9719-f668185bc29c.mp4
+
 
 
 <br>  
