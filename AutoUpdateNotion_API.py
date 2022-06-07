@@ -19,6 +19,10 @@ from Connect_NotionAPI import NotionUpdate_API as NAPI
 from Connect_NotionAPI import change_background as cb
 from myPackage import NotionprocessMonth as pMon
 from myPackage import NotionprocessReadData as NRD
+
+# Modify the data for git representation(Privacy reasons)
+from myPackage import remove_names_git
+
 import warnings
 from cryptography.utils import CryptographyDeprecationWarning
 warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
