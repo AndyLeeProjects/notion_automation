@@ -23,7 +23,7 @@ More information can be found in below links:
  <br>  
  <br>  
  
-## Automation Python Script Sample 
+## Automation Python Script Sample (No Sound)
 
 https://user-images.githubusercontent.com/84836749/172453935-355dff09-d834-4038-a430-207adfeffeb0.mp4
 
