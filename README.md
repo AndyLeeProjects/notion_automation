@@ -43,7 +43,8 @@ The Evaluation data is daily recorded self-evaluations stored in the Notion data
 It is read & organized for the visualization update.
 
 ### 5. [Create Visualization](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py)
-Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle. ![Image Sample](https://github.com/aLin-96/notion_automation/blob/main/sample_images/monthly_evaluation_visualization.jpg width="200"). 
+Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle. ![Image Sample](https://github.com/aLin-96/notion_automation/blob/main/sample_images/monthly_evaluation_visualization.jpg). 
+<img src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/monthly_evaluation_visualization.jpg" width="100" height="100">
 
 ### 6. Upload & Update evaluation jpg
 Using the Notion API, I can directly upload an image from Python. Thus, the created visualization will be updated right away after step 4. 
