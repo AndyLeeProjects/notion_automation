@@ -35,17 +35,20 @@ There are approximately 50 weekly tasks in my To-do list database, which are div
 Since it would be tedious and redundant to reschedule these tasks every day, I have successfully written a Python script that schedules it for me.
 It goes through every block(task) in the database and organizes today's to-do lists within seconds. 
 
+### 4. Update [Duration Database](https://github.com/aLin-96/notion_automation/blob/main/Duration_DB.jpg) in Notion
+The duration database demonstrates the total expected work hours and how many hours I have completed throughout the day. For each task, there is an Estimated duration tag (ex. Study Statistics - 1hr) that I can assign accordingly. Then these estimations are hourly imported to Python to compute & update the total, completed, and remaining hours using Notion API. The purpose of estimating duration time is to handle and use the given time more efficiently. 
+
 ### 3. Read & [Organize](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py) Evaluation Data 
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
 It is read & organized for the visualization update.
 
-### 4. [Create Visualization](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py)
+### 5. [Create Visualization](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py)
 Using the Matplotlib module, the graph is created demonstrating the [daily trend of my lifestyle](https://github.com/aLin-96/notion_automation/blob/main/evaluation_img_example.png). 
 
-### 5. Upload & Update evaluation jpg
+### 6. Upload & Update evaluation jpg
 Using the Notion API, I can directly upload an image from Python. Thus, the created visualization will be updated right away after step 4. 
 
-### 6. Task Schedular
+### 7. Task Schedular
 Using the built-in task schedular feature in Windows, I have set up for the Python script to run two times a day. 
 The script will run for the first time whenever I log in to my laptop and also at 9:00 pm for the second time.
 
