@@ -23,7 +23,7 @@ More information can be found in below links:
  <br>  
  <br>  
  
-## Automation Python Script  
+## Automation Python Script Sample 
 
 https://user-images.githubusercontent.com/84836749/172453935-355dff09-d834-4038-a430-207adfeffeb0.mp4
 
@@ -45,7 +45,7 @@ It goes through every block(task) in the database and organizes today's to-do li
 ### 3. Update Duration Database in Notion
 The duration database demonstrates the total expected work hours and how many hours I have completed throughout the day. For each task, there is an Estimated duration tag (ex. Study Statistics - 1hr) that I can assign accordingly. Then these estimations are hourly imported to Python to compute & update the total, completed, and remaining hours using Notion API. The purpose of estimating duration time is to handle and use the given time more efficiently.   
 
-<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/Duration_DB_sample.jpg" width="800" height="200" >
+<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/Duration_DB_sample.jpg" width="800" height="200" >
 
 ### 4. Read & [Organize](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py) Evaluation Data 
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
@@ -54,7 +54,7 @@ It is read & organized for the visualization update.
 ### 5. [Create Visualization](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py)
 Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle.  
 
-<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/monthly_evaluation_visualization.jpg" width="600" height="450" >
+<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/monthly_evaluation_visualization.jpg" width="600" height="450" >
   
   
 ### 6. Upload & Update evaluation jpg
