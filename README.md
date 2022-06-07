@@ -45,7 +45,7 @@ It is read & organized for the visualization update.
 ### 5. [Create Visualization](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py)
 Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle.  
 
-<img src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/monthly_evaluation_visualization.jpg" width="400" height="300" align="center">
+<img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_images/monthly_evaluation_visualization.jpg" width="400" height="300" >
   
   
 ### 6. Upload & Update evaluation jpg
