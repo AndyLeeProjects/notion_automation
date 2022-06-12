@@ -50,7 +50,7 @@ The duration database demonstrates the total expected work hours and how many ho
 
 <img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/Duration_DB_sample.jpg" width="800" height="200" >
 
-### 4. Read & [Organize](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py) Evaluation Data 
+### 4. Read & Organize Evaluation Data ([Python Sciprt](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py))
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
 It is read & organized for the visualization update.
 
