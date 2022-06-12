@@ -35,7 +35,7 @@ https://user-images.githubusercontent.com/84836749/172465933-55117519-cd91-4a19-
 <br>  
 
 
-## AutoUpdateNotion_API.py [(Python file)](https://github.com/aLin-96/notion_automation/blob/main/AutoUpdateNotion_API.py)
+## AutoUpdateNotion_API.py [(Python Script)](https://github.com/aLin-96/notion_automation/blob/main/AutoUpdateNotion_API.py)
 
 ### 1. Connecting to the Notion API
 Recently, Notion has released its API that conveniently allows users to extract data from all databases in Notion. Note that all data are imported to Python as JSON format, which requires data cleaning. 
