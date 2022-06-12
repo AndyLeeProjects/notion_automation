@@ -20,6 +20,10 @@ from Connect_NotionAPI import change_background as cb
 from myPackage import NotionprocessMonth as pMon
 from myPackage import NotionprocessReadData as NRD
 
+##### Update Duration DB #####
+import notion_durationDB     #
+##############################
+
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
 
@@ -167,7 +171,7 @@ class Connect_Notion:
     
     
     # Overwrite the existing excel file with an updated data for duration_EST data & self-evaluation data
-    def download_evaluationCSV(self, eval_data, duration_dic):
+    def download_evaluationCSV(self, eval_data):
         date = eval_data['Date'][0].split('/')
         month = date[0]
         year = date[-1][-2:]
@@ -181,7 +185,7 @@ class Connect_Notion:
             eval_data.to_csv("D:\Personal\progress\Data\%s" % file_name, index=False)
         except:
             pass
-        print('Update Completed\n\n')
+        print('Update Completed\n\n\n\n')
             
         
     def get_today(self, key):
@@ -244,37 +248,6 @@ class Connect_Notion:
         response = requests.request("PATCH", path, 
                                     headers=headers, data=json.dumps(updateData_to_waitlist))
     
-    def updateDuration_EST(self, pageId, headers, duration):
-        path = f"https://api.notion.com/v1/pages/{pageId}"
-    
-        updateDuration_EST = {
-            "properties": {
-                "Duration_EST": {
-                    "rich_text":[{
-                        "text":{
-                            "content":duration    
-                        }
-                    }]
-                }        
-            }
-        }
-        
-        response = requests.request("PATCH", path, 
-                                    headers=headers, data=json.dumps(updateDuration_EST)) 
-
-    def updateDuration_Tasks(self, pageId, headers, tasks):
-        path = f"https://api.notion.com/v1/pages/{pageId}"
-    
-        updateDuration_Tasks = {
-            "properties": {
-                "D_Tasks": {
-                    "number": tasks
-                        }        
-                    }
-                }
-        
-        response = requests.request("PATCH", path, 
-                                    headers=headers, data=json.dumps(updateDuration_Tasks)) 
 
 
     # Update Schedule
@@ -324,104 +297,32 @@ class Connect_Notion:
                     CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
                     print("[%s] Block Updated" % proj_data["Name"][block])
         
-        print("\nUpdate Complete\n\n")
+        print("\nUpdate Completed\n\n\n\n")
         
         # Return the total number of today's todo lists
         return proj_data['Category_current'].count("Today")
     
-    def get_DurationTime_EST(self, proj_data):
-        print('****************** Updating Duration Database ******************')
-        # Get 3 values
-            # 1. Total Task Duration EST   AND   Total num of Tasks
-            # 2. Finished Task Druation    AND   Total num of Finished Tasks
-            # 3. Remaining Task Duration   AND   Total num of Remaining Tasks
-        
-        tot_durationEST = 0
-        tot_numTasks = []
-        fin_durationEST = 0
-        fin_numTasks = []
-        rem_durationEST = 0
-        rem_numTasks = []
-        print("Calculating Durations...")
-        for task in range(len(proj_data['To do'])):
-            task_duration = proj_data['Duration_EST'][task]
-            task_status = proj_data['To do'][task]
-            
-            # Only look at Today's Column 
-            if proj_data['Category_current'][task] == "Today":
-                tot_durationEST += task_duration
-                tot_numTasks.append(task)
                 
-                # If task is Finished
-                if task_status == True:
-                    fin_durationEST += task_duration
-                    fin_numTasks.append(task)
-                    
-                # If task is NOT Finished
-                else:
-                    rem_durationEST += task_duration
-                    rem_numTasks.append(task)
-        
-        # Change Duration EST values into easier []hr []min format
-        tot_durationEST = "%dhr %dmin" % (tot_durationEST // 60, tot_durationEST % 60)
-        fin_durationEST = "%dhr %dmin" % (fin_durationEST // 60, fin_durationEST % 60)
-        rem_durationEST = "%dhr %dmin" % (rem_durationEST // 60, rem_durationEST % 60)
-        
-        # Make it into a dictionary for convenience
-        duration_dic = {'tot_durationEST':tot_durationEST,
-                        'tot_numTasks':len(tot_numTasks),
-                        'fin_durationEST':fin_durationEST,
-                        'fin_numTasks':len(fin_numTasks),
-                        'rem_durationEST':rem_durationEST,
-                        'rem_numTasks':len(rem_numTasks)}
-        return duration_dic
     
-    def update_DurationDB(self, duration_dic, D_proj_data):
-        print("Uploading to Duration DB...")
-        # Update Total, Finished, Remaining Durations & Tasks for Today
-        for row in range(3):
-            if D_proj_data['D_Title'][row] == "Total Work Hours EST":
-                CNotion.updateDuration_EST(D_proj_data['pageId'][row], 
-                                           headers, 
-                                           duration_dic['tot_durationEST'])
-                CNotion.updateDuration_Tasks(D_proj_data['pageId'][row], 
-                                           headers, 
-                                           duration_dic['tot_numTasks'])     
-                
-            elif D_proj_data['D_Title'][row] == "Total Work Hours Finished":
-                CNotion.updateDuration_EST(D_proj_data['pageId'][row], 
-                                           headers, 
-                                           duration_dic['fin_durationEST'])        
-                CNotion.updateDuration_Tasks(D_proj_data['pageId'][row], 
-                                           headers, 
-                                           duration_dic['fin_numTasks'])        
-            else:
-                CNotion.updateDuration_EST(D_proj_data['pageId'][row], 
-                                           headers, 
-                                           duration_dic['rem_durationEST'])        
-                CNotion.updateDuration_Tasks(D_proj_data['pageId'][row], 
-                                           headers, 
-                                           duration_dic['rem_numTasks'])       
-        print('Update Completed\n\n')
-                
     def update_evaluationJPG(self):
         print("****************** Uploading evaluation.jpg file ******************")
         data_eval = NAPI.nsync.query_databases()
         projects_eval = NAPI.nsync.get_projects_titles(data_eval)
         projects_data_eval = pd.DataFrame(NAPI.nsync.get_projects_data(data_eval,projects_eval))
-        projects_data_eval = projects_data_eval.rename(columns={'*Finished': 'Finished', '*Multiple (1~5)': 'Multiple','*Phone pickups':'Phone pickups',
-                                       '*Screen time':'Screen time','Drink (%)':'Drink %', 'Drink? (over 3 beer)':'Drink',
-                                       'Meditation (%)':'Meditation %', 'Meditation (min)':'Meditation', 'Multiple (%)':'Multiple %',
-                                       'Pick up (%)':'Pick up %', 'Reading (%)':'Reading %', 'Rise time (%)':'Rise time %',
-                                       'Run (%)':'Run %', 'Run (km)':'Run', 'Screen Time (%)':'Screen Time %', 'Work done (%)': 'Work done %',
-                                       'Overall Satisfaction':'Satisfaction','Personal Reading':'Reading','Tech Consumption':'Tech',
-                                       'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups'})
+        projects_data_eval = projects_data_eval.rename(
+            columns={'*Finished': 'Finished', '*Multiple (1~5)': 'Multiple','*Phone pickups':'Phone pickups',
+                    '*Screen time':'Screen time','Drink (%)':'Drink %', 'Drink? (over 3 beer)':'Drink',
+                    'Meditation (%)':'Meditation %', 'Meditation (min)':'Meditation', 'Multiple (%)':'Multiple %',
+                    'Pick up (%)':'Pick up %', 'Reading (%)':'Reading %', 'Rise time (%)':'Rise time %',
+                    'Run (%)':'Run %', 'Run (km)':'Run', 'Screen Time (%)':'Screen Time %', 'Work done (%)': 'Work done %',
+                    'Overall Satisfaction':'Satisfaction','Personal Reading':'Reading','Tech Consumption':'Tech',
+                    'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups'})
 
         # Monthly Evaluation Plot
         pMon.monthly_eval(projects_data_eval, update_window = True) # Replace it with projects_data_eval
         cb.update_Background() # Change the windows background with the self-evaluation IMG 
         #NAPI.uploadEvaluationJPG()
-        print('Upload Completed\n\n')
+        print('Upload Completed\n\n\n\n')
         
         # Save to D Drive (if plugged in) for further statistical analysis
         RDATA = NRD.read_data()
@@ -469,16 +370,10 @@ eval_data = CNotion.get_evaluation_data(data, projects)
 databaseId = secret.todo_db("DATABASE_ID")
 CNotion = Connect_Notion()
 proj_data = CNotion.connect_DB("Task Database")
-# Update Duration_DB
-duration_dic = CNotion.get_DurationTime_EST(proj_data)
-databaseId = secret.durationTime_EST("DATABASE_ID")
-D_proj_data = CNotion.connect_DB("Duration Database")
 
-# Update Duration Database
-CNotion.update_DurationDB(duration_dic,D_proj_data)
 
 # Download the evaluation data
-CNotion.download_evaluationCSV(eval_data, duration_dic)
+CNotion.download_evaluationCSV(eval_data)
 
 # Upload Evaluation Visualization 
 CNotion.update_evaluationJPG()
