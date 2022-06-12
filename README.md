@@ -50,11 +50,11 @@ The duration database demonstrates the total expected work hours and how many ho
 
 <img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/Duration_DB_sample.jpg" width="800" height="200" >
 
-### 4. Read & Organize Evaluation Data ([Python Sciprt](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py))
+### 4. Read & Organize Evaluation Data ([Python Script](https://github.com/aLin-96/notion_automation/blob/main/myPackage/organize_evaluation_data.py))
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
 It is read & organized for the visualization update.
 
-### 5. [Create Visualization](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py)
+### 5. Create Visualization ([Python Script](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py))
 Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle.  
 
 <img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/monthly_evaluation_visualization.jpg" width="600" height="450" >
