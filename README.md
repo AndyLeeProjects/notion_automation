@@ -35,7 +35,7 @@ https://user-images.githubusercontent.com/84836749/172465933-55117519-cd91-4a19-
 <br>  
 
 
-## AutoUpdateNotion_API.py [(See file)](https://github.com/aLin-96/notion_automation/blob/main/AutoUpdateNotion_API.py)
+## AutoUpdateNotion_API.py [(Python file)](https://github.com/aLin-96/notion_automation/blob/main/AutoUpdateNotion_API.py)
 
 ### 1. Connecting to the Notion API
 Recently, Notion has released its API that conveniently allows users to extract data from all databases in Notion. Note that all data are imported to Python as JSON format, which requires data cleaning. 
@@ -45,7 +45,7 @@ There are approximately 50 weekly tasks in my To-do list database, which are div
 Since it would be tedious and redundant to reschedule these tasks every day, I have successfully written a Python script that schedules it for me.
 It goes through every block(task) in the database and organizes today's to-do lists within seconds. 
 
-### 3. Update Duration Database in Notion
+### 3. Update Duration Database in Notion ([Python Script](https://github.com/aLin-96/notion_automation/blob/main/notion_durationDB.py))
 The duration database demonstrates the total expected work hours and how many hours I have completed throughout the day. For each task, there is an Estimated duration tag (ex. Study Statistics - 1hr) that I can assign accordingly. Then these estimations are hourly imported to Python to compute & update the total, completed, and remaining hours using Notion API. The purpose of estimating duration time is to handle and use the given time more efficiently.   
 
 <img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/Duration_DB_sample.jpg" width="800" height="200" >
