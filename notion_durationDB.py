@@ -307,7 +307,7 @@ headers = {
     "Content-Type": "application/json",
     "Notion-Version": "2021-05-13"
 }
-    
+
 CNotion = Connect_Notion()
 proj_data = CNotion.connect_DB("Task Database")
 
@@ -316,10 +316,11 @@ proj_data = CNotion.connect_DB("Task Database")
 duration_dic = CNotion.get_DurationTime_EST(proj_data)
 databaseId = secret.durationTime_EST("DATABASE_ID")
 D_proj_data = CNotion.connect_DB("Duration Database")
+
 # Update Duration Database
 CNotion.update_DurationDB(duration_dic,D_proj_data)
 
-# Update duration_est.csv
+# Update duration_est.csvs
 CNotion.update_durationCSV(duration_dic)
 
 

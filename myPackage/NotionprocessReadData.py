@@ -37,8 +37,6 @@ class read_data():
         file_name = str.zfill(str(month),2) + str(year) + '.csv'
         month_data = pd.read_csv(r'C:\NotionUpdate\progress\Data\%s' % file_name)
 
-                
-
         # Since these keys are represented by '⭐️', we need to change them into 
         # numerical values.
         keys = ['Social', 'Tech Consumption','Overall Satisfaction','Mentality','Productivity']
@@ -62,7 +60,7 @@ class read_data():
                                    'Pick up (%)':'Pick up %', 'Reading (%)':'Reading %', 'Rise time (%)':'Rise time %',
                                    'Run (%)':'Run %', 'Run (km)':'Run', 'Screen Time (%)':'Screen Time %', 'Work done (%)': 'Work done %',
                                    'Overall Satisfaction':'Satisfaction','Personal Reading':'Reading','Tech Consumption':'Tech',
-                                   'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups'})
+                                   'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups', 'Productivity & Focus':'Productivity'})
         return month_data
     
     def all_data(self, purpose):
@@ -81,13 +79,14 @@ class read_data():
                 break
             month += 1
         all_dat = pd.DataFrame(pCor.CorSetUp(months_key, purpose))
-        
         return all_dat, months_key
     
     def save_to_Ddrive(self, all_dat):
         # Save the data in the D drive for further statistical analysis
+        all_dat.to_csv(r'C:\NotionUpdate\progress\Data\all_dat.csv')
         try:
             all_dat.to_csv(r'D:\Spring 2022\Project\all_dat.csv')
+            all_dat.to_csv(r'D:\Personal\progress\Data\all_dat.csv')
             print("all_dat.csv saved to D Drive")
             print()
         except:
@@ -95,8 +94,9 @@ class read_data():
             
                 
 
-
-
+#RDATA = read_data()
+#mon = RDATA.monthly(12, 21)
+#all_data = RDATA.all_data("include date")[0]
 
 
 

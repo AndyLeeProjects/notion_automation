@@ -20,6 +20,23 @@ from datetime import datetime
 import warnings
 month_read = pRd.read_data()
 
+
+    
+def risetime_Goal(avg_time):
+    rt_goal = 0
+    # Set up a correct rise time limit
+    changed_occurence = srt.changed_risetime()
+    a = list(changed_occurence.values())
+    limit = (a[-1] - a[0])/60
+    
+    
+    if avg_time - (avg_time**2)/280 > limit:
+        rt_goal = avg_time - (avg_time**2)/280
+    else:
+        rt_goal = limit
+    return rt_goal
+
+    
 def wakeupStreak():
     all_dat = month_read.all_data('include date')[0]
     
@@ -31,35 +48,27 @@ def wakeupStreak():
     rt_3.reverse()
     risetime.reverse()
     
-    # First, find the average Rise time of last 30 of data
+    # First, find the average Rise time of last 30 data
     rt_3_avg = np.average(rt_3) # Avg Rise of past 30 days
     
-    
-    def risetime_Goal(avg_time):
-        rt_goal = 0
-        # Set up a correct rise time limit
-        a = list(changed_occurence.values())
-        limit = (a[-1] - a[0])/60
-        
-        
-        if avg_time - (avg_time**2)/280 > limit:
-            rt_goal = avg_time - (avg_time**2)/280
-        else:
-            rt_goal = limit
-        return rt_goal
+
     
     # Set the correct time limit 
-    a = list(changed_occurence.values())
+    changed_limits = list(changed_occurence.values())
+    newest_limit = changed_limits[-1] / 3600
+    new_limit = (9 - newest_limit) * -60
         
     for day in range(len(risetime)):
         
         # if my risetime average is below standard(goal) rise time, then
         # set the streak limit as 0
-        if risetime_Goal(np.average(risetime[day+1:day+32])) > (a[-2] - a[0])/60:
+            # If the average is too low, just set the limit to 0 (standard time)
+            # so that it won't be keep going down
+        if risetime_Goal(np.average(risetime[day+1:day+32])) >= new_limit:
             limit = risetime_Goal(np.average(risetime[day+1:day+32]))
         else:
-            limit = (a[-1] - a[0])/60
-            
+            limit = new_limit
+        
         if risetime[day] > limit: # Set up time standard
             break
         else:
@@ -100,11 +109,11 @@ def wakeupStreak():
     return len(rise_streak), len(total_streak), risetime_Goal(rt_3_avg), total_visual
 
 
-def monthly_eval(mon):
+def monthly_eval(mon, update_window):
     
     # count all data for the graph
-    all_dat_len = month_read.all_data('include date')[0]
-    all_dat_len = len(all_dat_len['Name'])
+    all_dat = month_read.all_data('include date')[0]
+    all_dat_len = len(all_dat['Name'])
     
     warnings.filterwarnings('ignore')
     
@@ -118,7 +127,8 @@ def monthly_eval(mon):
     rt2 = list(rt2/divgraph)
     fig, axe = plt.subplots(2,1, figsize = (12,9), gridspec_kw={'height_ratios': [2, 1]})
     fig.tight_layout(h_pad = 6)
-    
+
+
     # Set up time range
     if min(rt) > 0:
         start_p = 0
@@ -232,7 +242,7 @@ def monthly_eval(mon):
     axe[0].set_ylabel('Productivity', fontsize= 13,alpha=.8)
     axe[0].set_xticks(date_x)
     axe[0].set_xticklabels(date)
-    axe[0].set_ylim((0,np.max(tt*100)+30))
+    axe[0].set_ylim((0,np.max(tt*100)+25))
     axe[0].plot(0,-1,'r.',label = 'Drink') 
     axe[0].plot(0,-1,'w.',lw=2)        
     axe[0].plot(0,0,'g-.', label = 'Rise time', alpha=.3)
@@ -260,12 +270,6 @@ def monthly_eval(mon):
         # if input month is not a current month, don't apply streak
         # if the streak is 0, don't apply streak
     try:
-        '''
-        Cdate = mon['Date'][0][0:3].strip('/\"0')
-        today = datetime.today()
-        if int(Cdate) != today.month:
-            pass
-        '''
         Rstreak, Tstreak, avg_3, tt_3 = wakeupStreak() 
         tt_3 = int(tt_3)
         # - Rise time streak
@@ -273,14 +277,33 @@ def monthly_eval(mon):
         # - avg rise time for the past month
         # - avg total for the past month
         # - Find the exact time for average avg_3
-        rt_goal = str(time.strftime('%H:%M',time.gmtime(avg_3*60+32400)))
+        
+        
+        
+        
+        # In order to determine the limit, we need to see the average
+        # of date from most recent to -31.
+        # Then we use the limit that was used above to set up the streak
+
+        a = list(changed_occurence.values())
+        changed_limits = list(changed_occurence.values())
+        newest_limit = changed_limits[-1] / 3600
+        new_limit = (9 - newest_limit) * -60
+
+        if avg_3 > new_limit:
+            limit = avg_3
+        else:
+            limit = new_limit        
+        rt_goal = str(time.strftime('%H:%M',time.gmtime(limit*60 + a[0])))
         
         # Rise streak alignment
-        if len(str(Rstreak)) > 1:
+        if update_window == True:
+            x_ali = .66
+        elif len(str(Rstreak)) > 1:
             x_ali = .57
         else:
             x_ali = .58
-        
+            
         axe[0].text(x_ali,1.1,'Rise streak(%s): %d'% (rt_goal,Rstreak), color = 'green',fontweight = 'bold',
                         fontsize = 13, alpha = .83, transform= axe[0].transAxes)
         axe[0].text(.8,1.1,'Total streak(%d%%): %d'% (tt_3,Tstreak), color = 'magenta',fontweight = 'bold',
@@ -325,7 +348,12 @@ def monthly_eval(mon):
         #        axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
         #else:    
         axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
-        
+        fig.subplots_adjust(bottom=0.2) # or whatever
+    
+    # This size is tailored for window laptop background size
+    fig.set_size_inches(18.5, 10.5)
+    
+    
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     week = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
     fig.suptitle('Evaluation: '+datetime.today().strftime('%m/%d') + ' [' + week[datetime.today().weekday()] + ']', fontsize = 16, fontweight = 'bold')

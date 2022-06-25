@@ -20,13 +20,9 @@ from Connect_NotionAPI import change_background as cb
 from myPackage import NotionprocessMonth as pMon
 from myPackage import NotionprocessReadData as NRD
 
-##### Update Duration DB #####
-import notion_durationDB     #
-##############################
-
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
-
+#%%
 import warnings
 from cryptography.utils import CryptographyDeprecationWarning
 warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
@@ -371,6 +367,9 @@ databaseId = secret.todo_db("DATABASE_ID")
 CNotion = Connect_Notion()
 proj_data = CNotion.connect_DB("Task Database")
 
+##### Update Duration DB #####
+import notion_durationDB     #
+##############################
 
 # Download the evaluation data
 CNotion.download_evaluationCSV(eval_data)
@@ -378,6 +377,26 @@ CNotion.download_evaluationCSV(eval_data)
 # Upload Evaluation Visualization 
 CNotion.update_evaluationJPG()
 
+
+# Update Visualization for monthly evaluation (D Drive)
+from datetime import datetime
+import os
+try:
+    if os.name == 'posix':
+        sys.path.append(r'/Volumes/Programming/Personal/progress')
+    else:
+        sys.path.append(r'D:\Personal\progress')
+    from myPackage import Read_Data as pRd
+    from myPackage import Monthly_Eval as pMon
+    print("****************** Uploading evaluation.jpg file ******************")
+    mon = pRd.read_data()
+    cur_month = datetime.now().month
+    cur_year = int(datetime.now().strftime('%y'))
+    month = mon.monthly(cur_month, cur_year)
+    pMon.monthly_eval(month)
+    print("\nD drive evaluation JPG file Updated\n\n")
+except:
+    pass
 
 
 

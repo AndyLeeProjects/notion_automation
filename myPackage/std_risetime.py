@@ -25,7 +25,10 @@ def rise_time_adjustment(dat, changed_occurence):
 
 
     dates = dat['Date'][-60:]
+    dates = dates.reset_index()['Date']
+
     rt = dat['Rise time'][-60:]
+    rt = rt.reset_index()['Rise time']
     new_rt = []
     c = 0
     changed_dates = list(changed_occurence.keys())
@@ -41,7 +44,7 @@ def rise_time_adjustment(dat, changed_occurence):
                     datetimeobj = datetime.datetime.strptime(dates[i], '%m/%d/%Y')
                 except:
                     datetimeobj = datetime.datetime.strptime(dates[i], '%m/%d/%y')
-                    print(datetimeobj )
+                    print(datetimeobj)
                 date = datetimeobj.strftime('%Y-%m-%d')
             else:
                 date = dates[i]

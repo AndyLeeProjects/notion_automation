@@ -6,7 +6,9 @@ Created on Mon Apr  4 19:03:49 2022
 """
 import pandas as pd
 from datetime import datetime
-
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
 def get_evaluation_data(projects, data):
     print("Reading Evaluation Database...")
@@ -35,9 +37,11 @@ def get_evaluation_data(projects, data):
                             for i in range(len(data['results']))]
             
         elif p == "Key words":
+            temp = []
             for i in range(len(data['results'])):
                 path = data['results'][i]['properties']['Key words']['multi_select']
-                eval_data[p] = [path[row]['name']for row in range(len(path))]
+                temp.append([path[row]['name']for row in range(len(path))])
+            eval_data[p] = temp
                 
         elif p == "Events" or p == "Name":
             temp = []
@@ -56,7 +60,7 @@ def get_evaluation_data(projects, data):
         else:
             eval_data[p] = [data['results'][i]['properties'][p]['formula']['number']
                             for i in range(len(data['results']))]
-            
+
     # Reorder columns in the dataset
     eval_data = pd.DataFrame(eval_data, columns=['Name',
                                          '*Finished',
@@ -77,7 +81,7 @@ def get_evaluation_data(projects, data):
                                          'Overall Satisfaction',
                                          'Personal Reading',
                                          'Pick up (%)',
-                                         'Productivity & Focus',
+                                         'Productivity',
                                          'Reading (%)',
                                          'Rise time',
                                          'Rise time (%)',
@@ -88,7 +92,8 @@ def get_evaluation_data(projects, data):
                                          'Tech Consumption',
                                          'Total',
                                          'Total To-do List',
-                                         'Work done (%)'])
+                                         'Work done (%)',
+                                         'Key words'])
     eval_data['Created'] = pd.to_datetime(eval_data['Created'])
     eval_data['Date'] = pd.to_datetime(eval_data['Date'])
     eval_data['Created'] = eval_data['Created'].dt.strftime('%m/%d/%Y %H:%M')
