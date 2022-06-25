@@ -29,7 +29,7 @@ More information can be found in below links:
 
 https://user-images.githubusercontent.com/84836749/172465933-55117519-cd91-4a19-9719-f668185bc29c.mp4
 
-- Through Notion API, python gathers all information from the Schedule Database. Then it sorts each block by the tags related to today's date to move them into Today column(to-do lists). (ex. given that today is Saturday, 1/1/2022, I can label the block using the 'date tag'(1/1/2022), 'Weekend' tag, or 'Sat' tag. Then python will sort them accordingly)
+- Through Notion API, python gathers all information from the Schedule Database. Then it sorts each block by the tags related to today's date to move them into Today column(to-do lists). (ex. given that today is Saturday, 1/1/2022, I can label the block using the **date tag**(1/1/2022), **Weekend** tag, **Everyday** tag, or **Sat** tag. Then python will sort them accordingly)
 - Notice "Course: Speaking" block is checked and has 1 hour of estimated duration. Thus, Python will calculate the duration of all the completed blocks (tasks) to compute **Total Work Hours** and **Work Hours Finished** by gathering information from the database.
 
 <br>  
