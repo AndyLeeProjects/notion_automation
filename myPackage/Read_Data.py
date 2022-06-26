@@ -12,7 +12,6 @@ if os.name == 'posix':
     sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
 else:
     sys.path.append('C:\\NotionUpdate\progress\myPackage')
-import NotionprocessCorr as pCor
 import os
 import pandas as pd
 
@@ -39,6 +38,8 @@ class read_data():
         file_name = str.zfill(str(month),2) + str(year)
         month_data = pd.read_csv(path % file_name)
 
+                
+
         # Since these keys are represented by '⭐️', we need to change them into 
         # numerical values.
         keys = ['Social', 'Tech Consumption','Overall Satisfaction','Mentality','Productivity']
@@ -62,7 +63,7 @@ class read_data():
                                    'Pick up (%)':'Pick up %', 'Reading (%)':'Reading %', 'Rise time (%)':'Rise time %',
                                    'Run (%)':'Run %', 'Run (km)':'Run', 'Screen Time (%)':'Screen Time %', 'Work done (%)': 'Work done %',
                                    'Overall Satisfaction':'Satisfaction','Personal Reading':'Reading','Tech Consumption':'Tech',
-                                   'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups', 'Productivity & Focus':'Productivity'})
+                                   'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups'})
         return month_data
 
     def DeleteUnnecessaryVar(data,purpose):
@@ -143,36 +144,23 @@ class read_data():
                 
                 break
             month += 1
-<<<<<<< HEAD
-        all_dat = pd.DataFrame(pCor.CorSetUp(months_key, purpose))
-        return all_dat, months_key
-=======
             
         return pd.DataFrame(read_data.fill_data(months_key, purpose)), months_key
->>>>>>> 7e4030305dca870564d02494cb9440555ca1a5f6
     
     def save_to_Ddrive(self, all_dat):
         # Save the data in the D drive for further statistical analysis
-        all_dat.to_csv(r'C:\NotionUpdate\progress\Data\all_dat.csv')
         try:
             all_dat.to_csv(r'D:\Spring 2022\Project\all_dat.csv')
-            all_dat.to_csv(r'D:\Personal\progress\Data\all_dat.csv')
             print("all_dat.csv saved to D Drive")
             print()
         except:
             pass
     
 
-<<<<<<< HEAD
-#RDATA = read_data()
-#mon = RDATA.monthly(12, 21)
-#all_data = RDATA.all_data("include date")[0]
-=======
             
         
 
 
->>>>>>> 7e4030305dca870564d02494cb9440555ca1a5f6
 
 
 

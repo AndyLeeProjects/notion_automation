@@ -6,129 +6,62 @@ Created on Mon Mar 29 13:31:41 2021
 """
     
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 import os, sys
 if os.name == 'posix':
-    sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
+    sys.path.append('/Volumes/Programming/Personal/progress')
+    save_path = r"/Volumes/Programming/Spring 2022/DANL 310/my_website/aLin-96.github.io/monthly_eval_images/%s"
 else:
-    sys.path.append('C:\\NotionUpdate\progress\myPackage')
-import NotionprocessCorr as pCor
-import NotionprocessReadData as pRd
+    sys.path.append(r'D:\Personal\progress')
+    save_path = r"D:\Spring 2022\DANL 310\my_website\aLin-96.github.io\monthly_eval_images\%s"
+    save_path_1 = r"D:\Personal\progress\jpg files\Monthly Evaluation\%s"
+from myPackage import Read_Data as pRd
 import std_risetime as srt
 import time
 from datetime import datetime
-import warnings
 month_read = pRd.read_data()
 
 
-    
-def risetime_Goal(avg_time):
-    rt_goal = 0
-    # Set up a correct rise time limit
-    changed_occurence = srt.changed_risetime()
-    a = list(changed_occurence.values())
-    limit = (a[-1] - a[0])/60
-    
-    
-    if avg_time - (avg_time**2)/280 > limit:
-        rt_goal = avg_time - (avg_time**2)/280
-    else:
-        rt_goal = limit
-    return rt_goal
+def find_weekend_indices(datetime_array):
+    indices = []
+    for i in range(len(datetime_array)):
+        if datetime_array[i].weekday() >= 5:
+            if len(datetime_array) == i+1:
+                pass
+            else:
+                indices.append(i+1)
+    return indices
 
-    
-def wakeupStreak():
-    all_dat = month_read.all_data('include date')[0]
-    
-    changed_occurence = srt.changed_risetime()
-    risetime = srt.rise_time_adjustment(all_dat, changed_occurence)
-    
-    rise_streak = []
-    rt_3 = risetime[-30:]
-    rt_3.reverse()
-    risetime.reverse()
-    
-    # First, find the average Rise time of last 30 data
-    rt_3_avg = np.average(rt_3) # Avg Rise of past 30 days
-    
+def highlight_datetimes(indices, ax, mon):
+    i = 0
+    while i <= len(indices)-1:
+        ax.axvspan(mon.index[indices[i]-1], mon.index[indices[i]], facecolor = 'green',
+                   edgecolor='none', alpha = .1, label = "Weekends")
+        i += 1
 
+def monthly_eval(mon):
     
-    # Set the correct time limit 
-    changed_limits = list(changed_occurence.values())
-    newest_limit = changed_limits[-1] / 3600
-    new_limit = (9 - newest_limit) * -60
-        
-    for day in range(len(risetime)):
-        
-        # if my risetime average is below standard(goal) rise time, then
-        # set the streak limit as 0
-            # If the average is too low, just set the limit to 0 (standard time)
-            # so that it won't be keep going down
-        if risetime_Goal(np.average(risetime[day+1:day+32])) >= new_limit:
-            limit = risetime_Goal(np.average(risetime[day+1:day+32]))
-        else:
-            limit = new_limit
-        
-        if risetime[day] > limit: # Set up time standard
-            break
-        else:
-            rise_streak.append(day)
-    total_streak = []
-    totals = list(np.array(all_dat['Total'])*100)
-    tt_3 = totals[-30:]
-    totals.reverse()
-    tt_3_avg = np.average(tt_3)
-    
-    
-    def total_Goal(avg_tt):
-        return avg_tt + 6.5-(avg_tt**2)/1000
-    
-    for day in range(len(totals)):
-        # each total element has to be greater than or equl to the average 
-        # of 30 days from that element's point
-            # This prevents inaccuracy of the streak when it does not hold 
-            # the value it once did just because the standard went up
-            
-        
-        # Set a limit to 75% : values over 75 gets automatically stored in total_streak
-        if total_Goal(np.average(totals[day+1:day+32])) > 75:
-            if totals[day] < 75:
-                break
-        else:
-            if totals[day] < total_Goal(np.average(totals[day+1:day+32])):
-                break
-            
-        total_streak.append(day)
-    
-    # Set the streak(%) limit to 75%
-    if total_Goal(tt_3_avg) > 75:
-        total_visual = 75
-    else:
-        total_visual = total_Goal(tt_3_avg)
-    
-    return len(rise_streak), len(total_streak), risetime_Goal(rt_3_avg), total_visual
+    # Reverse month dataframe
+    mon = mon.reindex(index=mon.index[::-1])
 
-
-def monthly_eval(mon, update_window):
     
     # count all data for the graph
-    all_dat = month_read.all_data('include date')[0]
-    all_dat_len = len(all_dat['Name'])
-    
-    warnings.filterwarnings('ignore')
-    
+    all_dat_len = month_read.all_data('include date')[0]
+    all_dat_len = len(all_dat_len['Name'])
+        
     changed_occurence = srt.changed_risetime()
     rt = srt.rise_time_adjustment(mon, changed_occurence)
     
     # rt2: plot 1
     rt2 = np.array(srt.rise_time_adjustment(mon, changed_occurence))
+    
     # Divide in order for it to fit into the graph
     divgraph = 3
     rt2 = list(rt2/divgraph)
     fig, axe = plt.subplots(2,1, figsize = (12,9), gridspec_kw={'height_ratios': [2, 1]})
     fig.tight_layout(h_pad = 6)
-
-
+    
     # Set up time range
     if min(rt) > 0:
         start_p = 0
@@ -190,6 +123,12 @@ def monthly_eval(mon, update_window):
                 d = d.split('/')
                 date.append(d[1][:2].strip(' '))
                     
+    # Get Weekend indices and highlight Weekeends
+    mon['Date'] = pd.to_datetime(mon['Date'])
+    weekend_indices = find_weekend_indices(mon['Date'])
+    highlight_datetimes(weekend_indices, axe[0], mon)
+
+                
     # Plot Histogram
     axe[1].hist(rt, rt_bin, color = 'orange', width = 26)
     axe[1].set_ylim((0,max(t_vals)+3))
@@ -198,8 +137,7 @@ def monthly_eval(mon, update_window):
     axe[1].set_ylabel('occurence', fontsize = 13)
     axe[1].set_xticks(np.linspace(start_p,end_p,8))
     axe[1].set_xticklabels(Rtime)
-    axe[1].text(.75,-.9,'(%d) Last Updated: ' % all_dat_len + datetime.now().strftime('%Y-%m-%d %H:%M')    , color = 'k',fontweight = 'bold',
-                            fontsize = 9, alpha = .83, transform= axe[0].transAxes)
+
     # Add Average wake up time
     avgRT = np.sum(rt)/len(rt)
     avgRT_time = str(time.strftime('%H:%M',time.gmtime(avgRT*60+32400)))
@@ -237,17 +175,21 @@ def monthly_eval(mon, update_window):
     tt = np.around(tt,3)
     date_x = np.arange(0,len(tt))
     axe[0].plot(tt*100, 'm', lw=2, alpha = .3, label = 'Total (%)')
-    axe[0].set_title('Total %', fontsize = 15, fontweight = 'bold')
     axe[0].set_xlabel('Date', fontsize = 13)
     axe[0].set_ylabel('Productivity', fontsize= 13,alpha=.8)
     axe[0].set_xticks(date_x)
     axe[0].set_xticklabels(date)
-    axe[0].set_ylim((0,np.max(tt*100)+25))
+    axe[0].set_ylim((0,np.max(tt*100)+30))
     axe[0].plot(0,-1,'r.',label = 'Drink') 
     axe[0].plot(0,-1,'w.',lw=2)        
     axe[0].plot(0,0,'g-.', label = 'Rise time', alpha=.3)
-    axe[0].legend()
     axe[0].tick_params(axis='y', labelcolor='m')
+    
+    # Legends
+    handles, labels = axe[0].get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    axe[0].legend(by_label.values(), by_label.keys())
+
     
     # Days I drank
     dk = np.array(list(mon['Drink']))
@@ -265,56 +207,34 @@ def monthly_eval(mon, update_window):
         else:
             pass
         
-        
-    # Streaks
-        # if input month is not a current month, don't apply streak
-        # if the streak is 0, don't apply streak
-    try:
-        Rstreak, Tstreak, avg_3, tt_3 = wakeupStreak() 
-        tt_3 = int(tt_3)
-        # - Rise time streak
-        # - Total streak
-        # - avg rise time for the past month
-        # - avg total for the past month
-        # - Find the exact time for average avg_3
-        
-        
-        
-        
-        # In order to determine the limit, we need to see the average
-        # of date from most recent to -31.
-        # Then we use the limit that was used above to set up the streak
-
-        a = list(changed_occurence.values())
-        changed_limits = list(changed_occurence.values())
-        newest_limit = changed_limits[-1] / 3600
-        new_limit = (9 - newest_limit) * -60
-
-        if avg_3 > new_limit:
-            limit = avg_3
-        else:
-            limit = new_limit        
-        rt_goal = str(time.strftime('%H:%M',time.gmtime(limit*60 + a[0])))
-        
-        # Rise streak alignment
-        if update_window == True:
-            x_ali = .66
-        elif len(str(Rstreak)) > 1:
-            x_ali = .57
-        else:
-            x_ali = .58
-            
-        axe[0].text(x_ali,1.1,'Rise streak(%s): %d'% (rt_goal,Rstreak), color = 'green',fontweight = 'bold',
-                        fontsize = 13, alpha = .83, transform= axe[0].transAxes)
-        axe[0].text(.8,1.1,'Total streak(%d%%): %d'% (tt_3,Tstreak), color = 'magenta',fontweight = 'bold',
-                        fontsize = 13, alpha = .83, transform= axe[0].transAxes)
-    except KeyError:
-        pass       
+    # Get the Month's Screen Time AVG
+    screen_time_avg = np.average(mon['Screen time'])
+    stAVG_hour = round(screen_time_avg // 60)
+    stAVG_min = round(screen_time_avg  % 60)
+    screen_time_avg = str(stAVG_hour) + "hr " + str(stAVG_min) + "min"
+    
+    # Get the Month's Meditation AVG
+    meditation_avg = np.average(mon['Meditation'])
+    
+    # Get the Month's Reading AVG
+    reading_avg = np.average(mon['Reading'])
     
     # Monthly Average
     monthavg = np.average(mon['Total'])*100
-    axe[0].text(0,1.1,'Current Average: %.2f'% monthavg +'%', color = 'k',fontweight = 'bold',
+    axe[0].text(-.03,1.1,'Month Average: %.2f'% monthavg +'%', color = 'k',fontweight = 'bold',
                             fontsize = 13, alpha = .83, transform= axe[0].transAxes)
+    
+    # Other Average Values (Screen time, Meditation, Reading)
+    axe[0].text(.25,1.1,'Screen_time AVG: %s'% (screen_time_avg), color = 'skyblue',fontweight = 'bold',
+                    fontsize = 13, alpha = .83, transform= axe[0].transAxes)
+    axe[0].text(.56,1.1,'Meditation AVG: %.1fmin'% (meditation_avg), color = 'orange',fontweight = 'bold',
+                    fontsize = 13, alpha = .83, transform= axe[0].transAxes)
+    axe[0].text(.82,1.1,'Reading AVG: %.1fmin'% (reading_avg), color = 'red',fontweight = 'bold',
+                    fontsize = 13, alpha = .6, transform= axe[0].transAxes)
+    
+    
+    
+    
     
     # Write in minutes for Personal Reading > 100
     c = 0
@@ -348,15 +268,29 @@ def monthly_eval(mon, update_window):
         #        axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
         #else:    
         axe[0].text(date_x[j], round(tt[j]*100,2)+2, round(tt[j]*100,2), horizontalalignment = 'center' ,color = 'k')
-        fig.subplots_adjust(bottom=0.2) # or whatever
+        
+    # Get current month & date in string format
+    month_date = mon['Date'][0].strftime('%Y/%m/%d').split('/')
+    month_obj = datetime.strptime(month_date[1].strip('0'), "%m")
+    year_obj = datetime.strptime(month_date[0].strip('0'), "%Y")
     
-    # This size is tailored for window laptop background size
-    fig.set_size_inches(18.5, 10.5)
+    month_name = month_obj.strftime("%b")
+    year_name = year_obj.strftime("%Y")
+    date_title = month_name + ' ' + year_name
     
-    
+        
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    week = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-    fig.suptitle('Evaluation: '+datetime.today().strftime('%m/%d') + ' [' + week[datetime.today().weekday()] + ']', fontsize = 16, fontweight = 'bold')
+    fig.suptitle('Evaluation: ' + date_title, fontsize = 16, fontweight = 'bold')
     plt.savefig("C:\\NotionUpdate\progress\jpg files\Monthly Evaluation\month.jpg", format = 'jpg'
-            , dpi=1000, bbox_inches = 'tight')
+            , dpi=800, bbox_inches = 'tight')
+    
+    # If D drive is plugged in, save it in D drive as well
+    
+    try:
+        plt.savefig(save_path % (date_title.replace(" ","") + '.jpg'), format = 'jpg'
+                , dpi=800, bbox_inches = 'tight')
+        plt.savefig(save_path_1 % (date_title.replace(" ","") + '.jpg'), format = 'jpg'
+                , dpi=800, bbox_inches = 'tight')
+    except:
+        pass
 
