@@ -7,25 +7,25 @@ Created on Sat Apr  2 00:48:06 2022
 import requests, json
 import numpy as np
 from datetime import datetime
-import sys
+import sys, os
 import calendar
 import pandas as pd
 from datetime import time as time_time
 
-sys.path.append('C:\\NotionUpdate\\progress')
+if os.name == 'posix':
+    sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
+else:
+    sys.path.append('C:\\NotionUpdate\\progress')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
-from Connect_NotionAPI import NotionUpdate_API as NAPI
-from Connect_NotionAPI import change_background as cb
-from myPackage import NotionprocessMonth as pMon
-from myPackage import NotionprocessReadData as NRD
+from myPackage import NotionUpdate_API as NAPI
+from myPackage import change_background as cb
+from myPackage import Monthly_Eval as pMon
+from myPackage import Read_Data as NRD
 
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
-#%%
-import warnings
-from cryptography.utils import CryptographyDeprecationWarning
-warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
 
 
 
