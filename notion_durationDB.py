@@ -7,20 +7,23 @@ Created on Sat Apr  2 00:48:06 2022
 import requests, json
 import numpy as np
 from datetime import datetime
-import sys
+import sys, os
 import calendar
 import pandas as pd
-sys.path.append('C:\\NotionUpdate\\progress')
+if os.name == 'posix':
+    sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
+    duration_path1 = r'/Users/andylee/Desktop/git_prepFile/notion_automation/Data/duration_est.csv'
+else:
+    sys.path.append('C:\\NotionUpdate\\progress')
+    duration_path1 = r'C:\NotionUpdate\progress\Data\duration_est.csv'
+    duration_path2 = r'D:\Personal\progress\Data\duration_est.csv'
 from secret import secret
 from myPackage import organize_evaluation_data as oed
 #from Connect_NotionAPI import NotionUpdate_API as NAPI
-from myPackage import NotionprocessMonth as pMon
-from myPackage import NotionprocessReadData as NRD
-import warnings
-from cryptography.utils import CryptographyDeprecationWarning
+from myPackage import Monthly_Eval as pMon
+from myPackage import Read_Data as NRD
 from datetime import time as time_time
 from datetime import timedelta
-
 
 
 class Connect_Notion:
@@ -262,7 +265,7 @@ class Connect_Notion:
             pass
         today_date = today.strftime("%m/%d/%Y")
 
-        duration_df = pd.read_csv(r'C:\NotionUpdate\progress\Connect_NotionAPI\duration_est.csv',
+        duration_df = pd.read_csv(duration_path1,
                                   sep = ',', index_col = 0)
 
         new_row['Date'] = today_date
@@ -277,14 +280,14 @@ class Connect_Notion:
                     duration_df = duration_df.drop([duration_df.index[-1]])
                     duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)
                     
-                    duration_df.to_csv(r'C:\NotionUpdate\progress\Connect_NotionAPI\duration_est.csv')
+                    duration_df.to_csv(duration_path1)
         else:
             duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)
-            duration_df.to_csv(r'C:\NotionUpdate\progress\Connect_NotionAPI\duration_est.csv')
+            duration_df.to_csv(duration_path1)
             
         
         try:
-            duration_df.to_csv(r'D:\Personal\progress\Data\duration_est.csv')
+            duration_df.to_csv(duration_path2)
         except:
             pass
 
