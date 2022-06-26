@@ -28,7 +28,6 @@ from myPackage import remove_names_git
 
 
 
-
 class Connect_Notion:
     def __init__(self):
         pass    
@@ -338,7 +337,7 @@ class Connect_Notion:
     
 
         
-    
+
 databaseId = secret.todo_db("DATABASE_ID")
 token = secret.notion_API("token_key")
 headers = {
