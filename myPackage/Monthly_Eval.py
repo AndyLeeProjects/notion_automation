@@ -13,12 +13,10 @@ if os.name == 'posix':
     sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
 else:
     sys.path.append('C:\\NotionUpdate\progress\myPackage')
-import NotionprocessCorr as pCor
-import NotionprocessReadData as pRd
+import Read_Data as pRd
 import std_risetime as srt
 import time
 from datetime import datetime
-import warnings
 month_read = pRd.read_data()
 
 

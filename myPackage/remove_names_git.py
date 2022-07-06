@@ -1,39 +1,62 @@
-# -*- coding: utf-8 -*-
 """
 Created on Mon Apr  4 22:12:20 2022
-
 @author: anddy
 """
 import sys
-sys.path.append('C:\\NotionUpdate\\progress\\myPackage')
-import NotionprocessReadData as NRD
-
-year = 20
-month = 1
-mon = NRD.read_data()
-
-while True:
-    file_name = str(month).zfill(2) + str(year) + '.csv'
-    
-    try:
-        month_dat = mon.monthly(month, year)
-        
-        ####### Delete Name Columns #######
-        month_dat = month_dat.drop(columns=["Name"])
-        
-        month_dat.to_csv(r"C:\NotionUpdate\progress\git\notion_automation\Data\%s" % file_name, index=False)
+import os
+if os.name == 'posix':
+    sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
+    DIR = r'/Users/andylee/Desktop/git_prepFile/notion_automation/month_Data'
+    filesave_path1 = r'/Users/andylee/Desktop/git_prepFile/notion_automation/month_Data/%s'
+else:
+    sys.path.append('C:\\NotionUpdate\\progress')
+    DIR = r'C:\NotionUpdate\progress\month_Data'
+    filesave_path1 = r"C:\NotionUpdate\progress\git\notion_automation\month_Data\%s"
+    filesave_path2 = 'D:\\git\\self_evaluation\\progress\\month_Data\\%s'
+from myPackage import Read_Data as NRD
+"""
+The purpose for this python script is to prepare the monthly csv files so that
+they can be uploaded to github. The main modification includes getting rid of
+the names of the daily evaluations, which can be too private to publicize.
+"""
+def remove_names():
+    print("****************** GITHUB DATA UPDATE ******************")
+    # Set beginning year & month (When Data Collection Began)
+    year = 20
+    month = 9
+    # Subtracting 1 for all_dat.csv
+    dir_len = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
+    c = 1
+    while True:
+        file_name = str(month).zfill(2) + str(year) + '.csv'
         try:
-            month_dat.to_csv(r"D:\git\self_evaluation\progress\Data\%s" % file_name, index=False)
-        except:
-            pass
-        print("Name column deleted")
-    except FileNotFoundError:
-        pass
-    if month > 12:
-        year += 1
-        month = 0
-    if month == 4 and year == 22:
-        break
-    month += 1
-    
-    
+            month_dat = mon.monthly(month, year)
+            ####### Delete Name Columns #######
+            month_dat = month_dat.drop(columns=["Name"])
+            try:
+                month_dat = month_dat.drop(columns=["Key words"])
+            except KeyError:
+                pass
+            try:
+                month_dat = month_dat.drop(columns=["Events"])
+            except KeyError:
+                pass
+            month_dat.to_csv(filesave_path1 % file_name, index=False)
+            try:
+                month_dat.to_csv(filesave_path2 % file_name, index=False)
+            except:
+                pass
+            print("%s/%s Name column deleted & saved" % (month,year))
+            c += 1
+        except FileNotFoundError:
+            if dir_len == c:
+                print("Completed\n\n")
+                break
+            else:
+                pass
+        if month > 12:
+            year += 1
+            month = 0
+        month += 1
+mon = NRD.read_data()
+remove_names()
