@@ -32,11 +32,12 @@ class read_data():
 
         # Change the path name depending on the operating system
         if os.name == 'nt':
-            path = r'C:\\NotionUpdate\progress\Data\%s.csv'
+            path = r'C:\\NotionUpdate\progress\month_Data\%s.csv'
         else:        
-            path = r'/Volumes/Programming/Personal/progress/Data/%s.csv'
+            path = r'/Volumes/Programming/Personal/progress/month_Data/%s.csv'
         file_name = str.zfill(str(month),2) + str(year)
         month_data = pd.read_csv(path % file_name)
+        month_data['Date'] = month_data['Date'].astype('datetime64[ns]')
 
                 
 
@@ -63,7 +64,13 @@ class read_data():
                                    'Pick up (%)':'Pick up %', 'Reading (%)':'Reading %', 'Rise time (%)':'Rise time %',
                                    'Run (%)':'Run %', 'Run (km)':'Run', 'Screen Time (%)':'Screen Time %', 'Work done (%)': 'Work done %',
                                    'Overall Satisfaction':'Satisfaction','Personal Reading':'Reading','Tech Consumption':'Tech',
-                                   'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups'})
+                                   'Total To-do List':'Tot To-do', 'Phone pickups':'Pickups', 'Key words':'Key_words'})
+        
+        # Replace commas for mysql readability
+        try:
+            month_data['Key_words'] = month_data['Key_words'].str.replace(', ', '-')
+        except:
+            pass
         return month_data
 
     def DeleteUnnecessaryVar(data,purpose):
@@ -71,21 +78,21 @@ class read_data():
         Depending on the purpose of the use of the data, return appropriate columns
         """
         if 'include date' in purpose:
-            deleteKeys = ['Finished','Meditation %','Multiple %',
+            deleteKeys = ['Meditation %','Multiple %',
                     'Rise time %','Screen time %','Pick up %',
                     'Drink %', 'Reading %', 'Books finished',
-                    'Run %', 'Events','Screen Time %','Multiple EST']
+                    'Run %', 'Events','Screen Time %','Multiple EST', 'Created']
         elif 'RSTUDIO' == purpose:
             deleteKeys = ['Meditation %','Multiple %',
                     'Rise time %','Screen time %','Pick up %',
                     'Drink %', 'Reading %', 'Books finished',
-                    'Run %', 'Events','Screen Time %','Multiple EST']
+                    'Run %', 'Events','Screen Time %','Multiple EST', 'Created']
         else:
             # Omit Date, since it only will be needed for monthly dependency
             deleteKeys = ['Date','Finished','Meditation %','Multiple %',
                     'Rise time %','Screen time %','Pick up %',
                     'Drink %', 'Reading %', 'Books finished',
-                    'Run %', 'Events','Screen Time %', 'Multiple EST']
+                    'Run %', 'Events','Screen Time %', 'Multiple EST', 'Created']
 
         for item in deleteKeys:
             try:
@@ -132,37 +139,31 @@ class read_data():
         year = 20
         month = 9
 
-        months_key = []
+        months_dfs = []
         while True:
             try:
                 if month == 13:
                     month = 1
                     year += 1
-                months_key.append(self.monthly(month, year))
+                months_dfs.append(self.monthly(month, year))
                 
             except:
                 
                 break
             month += 1
             
-        return pd.DataFrame(read_data.fill_data(months_key, purpose)), months_key
+        return pd.DataFrame(read_data.fill_data(months_dfs, purpose)), months_dfs
     
     def save_to_Ddrive(self, all_dat):
         # Save the data in the D drive for further statistical analysis
         try:
             all_dat.to_csv(r'D:\Spring 2022\Project\all_dat.csv')
+            all_dat.to_csv(r'"D:\Personal\progress\Data\all_dat.csv')
             print("all_dat.csv saved to D Drive")
             print()
         except:
             pass
     
-
-            
-        
-
-
-
-
 
 
 

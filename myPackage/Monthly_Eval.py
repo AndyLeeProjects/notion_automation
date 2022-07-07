@@ -117,8 +117,12 @@ def find_weekend_indices(datetime_array):
 def highlight_datetimes(indices, ax, mon):
     i = 0
     while i <= len(indices)-1:
-        ax.axvspan(mon.index[indices[i]-1], mon.index[indices[i]], facecolor = 'green',
-                   edgecolor='none', alpha = .1, label = "Weekends")
+        if indices[i] == 0:
+            ax.axvspan(mon.index[indices[i]], mon.index[indices[i]+1], facecolor = 'green',
+                       edgecolor='none', alpha = .05 , label = "Weekends")
+        else:
+            ax.axvspan(mon.index[indices[i]-1], mon.index[indices[i]], facecolor = 'green',
+                       edgecolor='none', alpha = .05 , label = "Weekends")
         i += 1
 
 
@@ -127,9 +131,7 @@ def monthly_eval(mon, update_window):
     # count all data for the graph
     all_dat = month_read.all_data('include date')[0]
     all_dat_len = len(all_dat['Name'])
-    
-    warnings.filterwarnings('ignore')
-    
+        
     changed_occurence = srt.changed_risetime()
     rt = srt.rise_time_adjustment(mon, changed_occurence)
     
@@ -270,7 +272,7 @@ def monthly_eval(mon, update_window):
     # Legends
     handles, labels = axe[0].get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    axe[0].legend(by_label.values(), by_label.keys())
+    axe[0].legend(by_label.values(), by_label.keys(), ncol=len(by_label.keys()))
     
     # Days I drank
     dk = np.array(list(mon['Drink']))

@@ -315,7 +315,8 @@ class Connect_Notion:
 
         # Monthly Evaluation Plot
         pMon.monthly_eval(projects_data_eval, update_window = True) # Replace it with projects_data_eval
-        cb.update_Background() # Change the windows background with the self-evaluation IMG 
+        if os.name != 'posix':
+            cb.update_Background() # Change the windows background with the self-evaluation IMG 
         #NAPI.uploadEvaluationJPG()
         print('Upload Completed\n\n\n\n')
         
