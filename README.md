@@ -55,16 +55,19 @@ The duration database demonstrates the total expected work hours and how many ho
 The Evaluation data is daily recorded self-evaluations stored in the Notion database. 
 It is read & organized for the visualization update.
 
-### 5. Create Visualization ([Python Script](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py))
+### 5. Record Data (Excel, MySQL)
+Utilizing MySQL will be one of the efficient ways to store and retrieve daily accumulating data. Through mysql.connector module, the Self Evaluation database in the local server can be accessed to send necessary queries for this process. 
+
+### 6. Create Visualization ([Python Script](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py))
 Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle.  
 
 <img align="center" src="https://github.com/aLin-96/notion_automation/blob/main/sample_ImagesVideos/monthly_evaluation_visualization.jpg" width="600" height="450" >
   
   
-### 6. Upload & Update evaluation jpg
+### 7. Upload & Update evaluation jpg
 Using the Notion API, I can directly upload an image from Python. Thus, the created visualization will be updated right away after step 4. 
 
-### 7. Task Schedular
+### 8. Task Schedular
 Using the built-in task schedular feature in Windows, I have set up for the Python script to run two times a day. 
 The script will run for the first time whenever I log in to my laptop and also at 9:00 pm for the second time.
  
