@@ -56,7 +56,7 @@ The Evaluation data is daily recorded self-evaluations stored in the Notion data
 It is read & organized for the visualization update.
 
 ### 5. Record Data (Excel, MySQL)
-Utilizing MySQL will be one of the efficient ways to store and retrieve daily accumulating data. Through mysql.connector module, the Self Evaluation database in the local server can be accessed to send necessary queries for this process. 
+Utilizing MySQL will be one of the efficient ways to store and retrieve daily accumulating data. Through mysql.connector module, the Self Evaluation database in the local server can be accessed to send necessary queries for the automation process. 
 
 ### 6. Create Visualization ([Python Script](https://github.com/aLin-96/notion_automation/blob/main/myPackage/NotionprocessMonth.py))
 Using the Matplotlib module, the graph is created demonstrating the daily trend of my lifestyle.  
