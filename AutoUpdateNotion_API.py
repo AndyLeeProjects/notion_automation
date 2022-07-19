@@ -197,7 +197,7 @@ class Connect_Notion:
         
         # Determine if today is weekday
         if week_day_num > 4:
-            weekday = None
+            weekday = 'Weekend'
         else:
             weekday = 'Weekday'
         
