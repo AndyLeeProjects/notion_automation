@@ -174,10 +174,10 @@ class Connect_Notion:
         
         print('\n****************** Update Evaluation CSV Data ******************')
         
-        eval_data.to_csv("C:\\NotionUpdate\progress\Data\%s" % file_name, index=False)
+        eval_data.to_csv("C:\\NotionUpdate\progress\month_Data\%s" % file_name, index=False)
         # Download to my D drive if plugged in 
         try:
-            eval_data.to_csv("D:\Personal\progress\Data\%s" % file_name, index=False)
+            eval_data.to_csv("D:\Personal\progress\month_Data\%s" % file_name, index=False)
         except:
             pass
         print('Update Completed\n\n\n\n')
