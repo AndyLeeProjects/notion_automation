@@ -55,7 +55,7 @@ class Connect_Notion:
         # When the database is Empty, the variable title will not be read.
         # Thus, we need to make sure every varaible title is in our projects_key list
         if database_name == "Task Database":
-            # since we are using 2 different data sets for the same code
+            # since we are using 2 different data sets for the same code    
             if "Due Date" not in project_keys and "Meditation (%)" not in project_keys:
                 return project_keys + ["Due Date","pageId"]
             else:

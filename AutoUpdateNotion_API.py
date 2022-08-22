@@ -18,6 +18,7 @@ else:
     sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
+from myPackage import NotionUpdate_API as NAPI
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD

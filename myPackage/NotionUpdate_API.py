@@ -13,7 +13,7 @@ from secret import secret
 
 
 
-DATABASE_ID = secret.evaluation_db("DATABASE_ID")
+DATABASE_ID = secret.evaluation_db("database_id")
 NOTION_URL = 'https://api.notion.com/v1/databases/'
 token_key = secret.notion_API("token_key")
 
