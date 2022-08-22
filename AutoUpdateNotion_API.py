@@ -15,7 +15,7 @@ from datetime import time as time_time
 if os.name == 'posix':
     sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
 else:
-    sys.path.append('C:\\NotionUpdate\\progress')
+    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
 from myPackage import NotionUpdate_API as NAPI
@@ -174,10 +174,10 @@ class Connect_Notion:
         
         print('\n****************** Update Evaluation CSV Data ******************')
         
-        eval_data.to_csv("C:\\NotionUpdate\progress\month_Data\%s" % file_name, index=False)
+        eval_data.to_csv("C:\\NotionUpdate\\progress\\notion_automation\\month_Data\\%s" % file_name, index=False)
         # Download to my D drive if plugged in 
         try:
-            eval_data.to_csv("D:\Personal\progress\month_Data\%s" % file_name, index=False)
+            eval_data.to_csv("D:\\Personal\\progress\\notion_automation\\month_Data\\%s" % file_name, index=False)
         except:
             pass
         print('Update Completed\n\n\n\n')
@@ -379,15 +379,11 @@ CNotion.update_evaluationJPG()
 
 
 # Update Visualization for monthly evaluation (D Drive)
-from datetime import datetime
-import os
 try:
     if os.name == 'posix':
         sys.path.append(r'/Volumes/Programming/Personal/progress')
     else:
-        sys.path.append(r'D:\Personal\progress')
-    from myPackage import Read_Data as pRd
-    from myPackage import Monthly_Eval as pMon
+        sys.path.append(r'D:\Personal\progress\notion_automation')
     print("****************** Uploading evaluation.jpg file ******************")
     mon = pRd.read_data()
     cur_month = datetime.now().month

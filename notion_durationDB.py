@@ -15,8 +15,8 @@ if os.name == 'posix':
     duration_path1 = r'/Users/andylee/Desktop/git_prepFile/notion_automation/Data/duration_est.csv'
 else:
     sys.path.append('C:\\NotionUpdate\\progress')
-    duration_path1 = r'C:\NotionUpdate\progress\Data\duration_est.csv'
-    duration_path2 = r'D:\Personal\progress\Data\duration_est.csv'
+    duration_path1 = r'C:\NotionUpdate\progress\notion_automation\Data\duration_est.csv'
+    duration_path2 = r'D:\Personal\progress\notion_automation\Data\duration_est.csv'
 from secret import secret
 from myPackage import organize_evaluation_data as oed
 #from Connect_NotionAPI import NotionUpdate_API as NAPI

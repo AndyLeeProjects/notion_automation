@@ -12,7 +12,7 @@ import os, sys
 if os.name == 'posix':
     sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
 else:
-    sys.path.append('C:\\NotionUpdate\progress\myPackage')
+    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation\\myPackage')
 import Read_Data as pRd
 import std_risetime as srt
 import time
@@ -130,7 +130,7 @@ def monthly_eval(mon, update_window):
     
     # count all data for the graph
     all_dat = month_read.all_data('include date')[0]
-    all_dat_len = len(all_dat['Name'])
+    all_dat_len = len(all_dat['Date'])
         
     changed_occurence = srt.changed_risetime()
     rt = srt.rise_time_adjustment(mon, changed_occurence)
@@ -192,11 +192,13 @@ def monthly_eval(mon, update_window):
     
     # Set up date for xticklabels
     date = []
-    if '/' in mon['Name'][0] and '/' in mon['Name'][-1]:
-        for d in mon['Name']:
-            d = d.split('/')
-            date.append(d[1][:2].strip(' '))
-    else:
+    
+    try: 
+        if '/' in mon['Name'][0] and '/' in mon['Name'][-1]:
+            for d in mon['Name']:
+                d = d.split('/')
+                date.append(d[1][:2].strip(' '))
+    except:
         for d in mon['Date']:
             if '-' in d:
                 d = d.split('-')

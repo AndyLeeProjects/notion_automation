@@ -6,14 +6,13 @@ Created on Mon Mar 29 13:37:11 2021
 """
 
 import numpy as np
+import pandas as pd
 import sys, os
 # Change the path name depending on the operating system
-if os.name == 'posix':
+if os.set_handle_inheritable == 'posix':
     sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
 else:
-    sys.path.append('C:\\NotionUpdate\progress\myPackage')
-import os
-import pandas as pd
+    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation\\myPackage')
 
 
 '''
@@ -32,7 +31,7 @@ class read_data():
 
         # Change the path name depending on the operating system
         if os.name == 'nt':
-            path = r'C:\\NotionUpdate\progress\month_Data\%s.csv'
+            path = r'C:\NotionUpdate\progress\notion_automation\month_Data\%s.csv'
         else:        
             path = r'/Volumes/Programming/Personal/progress/month_Data/%s.csv'
         file_name = str.zfill(str(month),2) + str(year)
@@ -127,8 +126,8 @@ class read_data():
         
         # If the size don't match, make the difference 0
         for i in all_dat.keys():
-            if len(all_dat[i]) != len(all_dat['Name']):
-                all_dat[i] = [0]*(len(all_dat['Name'])-len(all_dat[i]))+all_dat[i]
+            if len(all_dat[i]) != len(all_dat['Date']):
+                all_dat[i] = [0]*(len(all_dat['Date'])-len(all_dat[i]))+all_dat[i]
         
         # Delete unimportant, redundant factor 
         all_dat = read_data.DeleteUnnecessaryVar(all_dat, purpose)
@@ -158,7 +157,7 @@ class read_data():
         # Save the data in the D drive for further statistical analysis
         try:
             all_dat.to_csv(r'D:\Spring 2022\Project\all_dat.csv')
-            all_dat.to_csv(r'"D:\Personal\progress\Data\all_dat.csv')
+            all_dat.to_csv(r'"D:\Personal\progress\notion_automation\Data\all_dat.csv')
             print("all_dat.csv saved to D Drive")
             print()
         except:
