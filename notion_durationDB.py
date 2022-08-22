@@ -303,7 +303,7 @@ class Connect_Notion:
             
         
 print('Updating Duration Database...')
-databaseId = secret.todo_db("DATABASE_ID")
+databaseId = secret.todo_db("database_id")
 token = secret.notion_API("token_key")
 headers = {
     "Authorization": "Bearer " + token,
@@ -317,7 +317,7 @@ proj_data = CNotion.connect_DB("Task Database")
 
 # Update Total Duration Estimate Database
 duration_dic = CNotion.get_DurationTime_EST(proj_data)
-databaseId = secret.durationTime_EST("DATABASE_ID")
+databaseId = secret.durationTime_EST("database_id")
 D_proj_data = CNotion.connect_DB("Duration Database")
 
 # Update Duration Database

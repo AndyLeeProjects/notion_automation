@@ -18,7 +18,6 @@ else:
     sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
-from myPackage import NotionUpdate_API as NAPI
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
@@ -256,7 +255,7 @@ class Connect_Notion:
             
             # If it's past 1:00 pm, don't reschedule it again
                 # Since I may have made some modifications, which needs to be fixed
-            if CNotion.is_time_between(time_time(13,00),time_time(23,59)) == True:
+            if CNotion.is_time_between(time_time(13,00),time_time(2,00)) == True:
                 return proj_data['Category_current'].count("Today")
             
             
@@ -339,7 +338,7 @@ class Connect_Notion:
 
         
 
-databaseId = secret.todo_db("DATABASE_ID")
+databaseId = secret.todo_db("database_id")
 token = secret.notion_API("token_key")
 headers = {
     "Authorization": "Bearer " + token,
@@ -355,7 +354,7 @@ proj_data = CNotion.connect_DB("Task Database")
 CNotion.update_Schedule(proj_data)
 
 # Read Evaluation Database in Notion using different database ID
-databaseId = secret.evaluation_db("DATABASE_ID")
+databaseId = secret.evaluation_db("database_id")
 CNotion = Connect_Notion()
 data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data, "Task Database")
@@ -363,7 +362,7 @@ eval_data = CNotion.get_evaluation_data(data, projects)
 
 # Update Total Duration Estimate Database
 # Reconnect to get updated database
-databaseId = secret.todo_db("DATABASE_ID")
+databaseId = secret.todo_db("database_id")
 CNotion = Connect_Notion()
 proj_data = CNotion.connect_DB("Task Database")
 

@@ -14,7 +14,7 @@ from secret import secret
 import Notion_API as Notion
 
 # ********** DO NOT DELETE THESE **********
-#import notion_durationDB
+import notion_durationDB
 from myPackage import notion_routine_API # saves morning routine
 # *****************************************
 
