@@ -229,8 +229,8 @@ class NotionSync:
         # Send every even hours
         if int(hour) % 2 == 0 and int(minute) < 2:
             data = {
-                'token': secret.connect_slack('slack_token'),
-                'channel': secret.connect_slack('user_id_hourly_update'),    # User ID.
+                'token': secret.connect_slack(key = 'slack_token', app_name = 'progress_report'),
+                'channel': secret.connect_slack(key = 'user_id_hourly_update'),    # User ID.
                 'as_user': True,
                 'text': self.message
             }
