@@ -207,11 +207,13 @@ class NotionSync:
             if today_promises == []:
                 today_promises_str = ''
             else:
-                for p in range(len(today_promises)):
-                    today_promises_str += '\n\t' + str(p + 1) + '. ' + today_promises[p]
+                if isinstance(today_promises, list):
+                    for p in range(len(today_promises)):
+                        today_promises_str += '\n\t' + str(p + 1) + '. ' + today_promises[p]
+                else:
+                    today_promises_str += '\n\t' + today_promises
 
-        message = '''
-                ****************************************\nUpdated Time: %s   < %.2f >
+        message = '''****************************************\nUpdated Time: %s   < %.2f >
                 ****************************************\n\nToday's Estimated Percentage : %.2f%%\n'''%(datetime.now().strftime('%m/%d %H:%M'),  \
                 self.totalEST,self.totalEST) + estimated_workHours_str + self.progress + \
                      today_promises_str + '\n' + thankful_for_str + '\n'
@@ -226,8 +228,8 @@ class NotionSync:
         hour = now.strftime('%H')
         minute = now.strftime('%M')
 
-        # Send every even hours
-        if int(hour) % 2 == 0 and int(minute) < 2:
+        # Send every 3 hours
+        if int(hour) % 3 == 0 and int(minute) < 2:
             data = {
                 'token': secret.connect_slack(key = 'slack_token', app_name = 'progress_report'),
                 'channel': secret.connect_slack(key = 'user_id_hourly_update'),    # User ID.

@@ -5,6 +5,7 @@ Created on Mon Mar 29 13:31:41 2021
 @author: anddy
 """
     
+from logging import raiseExceptions
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -83,7 +84,7 @@ def wakeupStreak():
         return avg_tt + 6.5-(avg_tt**2)/1000
     
     for day in range(len(totals)):
-        # each total element has to be greater than or equl to the average 
+        # each total element has to be greater than or equal to the average 
         # of 30 days from that element's point
             # This prevents inaccuracy of the streak when it does not hold 
             # the value it once did just because the standard went up
@@ -193,11 +194,13 @@ def monthly_eval(mon, update_window):
     # Set up date for xticklabels
     date = []
     
-    try: 
+    try:
         if '/' in mon['Name'][0] and '/' in mon['Name'][-1]:
             for d in mon['Name']:
                 d = d.split('/')
                 date.append(d[1][:2].strip(' '))
+        else:
+            raise ValueError
     except:
         for d in mon['Date']:
             if '-' in d:
@@ -207,7 +210,7 @@ def monthly_eval(mon, update_window):
                 d = d.split('/')
                 date.append(d[1][:2].strip(' '))
                 
-    # Get Weekend indices and highlight Weekeends
+    # Get Weekend indices and highlight Weekends
     mon['Date'] = pd.to_datetime(mon['Date'])
     weekend_indices = find_weekend_indices(mon['Date'])
     highlight_datetimes(weekend_indices, axe[0], mon)
