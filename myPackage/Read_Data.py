@@ -156,8 +156,8 @@ class read_data():
     def save_to_Ddrive(self, all_dat):
         # Save the data in the D drive for further statistical analysis
         try:
-            all_dat.to_csv(r'D:\Spring 2022\Project\all_dat.csv')
-            all_dat.to_csv(r'"D:\Personal\progress\notion_automation\Data\all_dat.csv')
+            all_dat.to_csv(r'D:\AndyLeeProjects\Evaluation Data\all_dat.csv')
+            all_dat.to_csv(r'D:\Personal\progress\notion_automation\Data\all_dat.csv')
             print("all_dat.csv saved to D Drive")
             print()
         except:
