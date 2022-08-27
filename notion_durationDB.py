@@ -14,7 +14,7 @@ if os.name == 'posix':
     sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
     duration_path1 = r'/Users/andylee/Desktop/git_prepFile/notion_automation/Data/duration_est.csv'
 else:
-    sys.path.append('C:\\NotionUpdate\\progress')
+    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
     duration_path1 = r'C:\NotionUpdate\progress\notion_automation\Data\duration_est.csv'
     duration_path2 = r'D:\Personal\progress\notion_automation\Data\duration_est.csv'
 from secret import secret
@@ -53,7 +53,7 @@ class Connect_Notion:
         
         
         # When the database is Empty, the variable title will not be read.
-        # Thus, we need to make sure every varaible title is in our projects_key list
+        # Thus, we need to make sure every variable title is in our projects_key list
         if database_name == "Task Database":
             # since we are using 2 different data sets for the same code    
             if "Due Date" not in project_keys and "Meditation (%)" not in project_keys:
