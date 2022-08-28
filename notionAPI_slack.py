@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from lib2to3.pgen2 import token
 import requests
 import sys
 import numpy as np
@@ -213,8 +212,7 @@ class NotionSync:
                 else:
                     today_promises_str += '\n\t' + today_promises
 
-        message = '''****************************************\nUpdated Time: %s   < %.2f >
-                ****************************************\n\nToday's Estimated Percentage : %.2f%%\n'''%(datetime.now().strftime('%m/%d %H:%M'),  \
+        message = '''****************************************\nUpdated Time: %s   < %.2f >\n****************************************\n\nToday's Estimated Percentage : %.2f%%\n'''%(datetime.now().strftime('%m/%d %H:%M'),  \
                 self.totalEST,self.totalEST) + estimated_workHours_str + self.progress + \
                      today_promises_str + '\n' + thankful_for_str + '\n'
         # Change self.progress -> self.estimates if you want to see the estimates variables
@@ -231,13 +229,13 @@ class NotionSync:
         # Send every 3 hours
         if int(hour) % 3 == 0 and int(minute) < 2:
             data = {
-                'token': secret.connect_slack(key = 'slack_token', app_name = 'progress_report'),
+                'token': secret.connect_slack(key = 'token_key', app_name = 'progress_report'),
                 'channel': secret.connect_slack(key = 'user_id_hourly_update'),    # User ID.
                 'as_user': True,
                 'text': self.message
             }
             
-            requests.post(url='https://slack.com/api/chat.postMessage',
+            result = requests.post(url='https://slack.com/api/chat.postMessage',
                         data=data)
         else:
             pass
