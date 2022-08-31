@@ -17,7 +17,6 @@ if os.name == 'posix':
 else:
     sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
 from secret import secret
-from myPackage import organize_evaluation_data as oed
 from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
@@ -34,39 +33,42 @@ class Connect_Notion:
         # Get Token Key
         self.token_key = secret.notion_API("token_key")
 
-
         # Get Task Schedule Data -> task_data
         self.task_databaseId = secret.task_scheduleDB("database_id")
-        self.task_data = N_API.ConnectNotionDB(self.eval_databaseId, self.token_key)
+        TASK = N_API.ConnectNotionDB(self.task_databaseId, self.token_key)
+        self.task_data = TASK.retrieve_data()
 
         # Get Evaluation Data -> eval_data
         self.eval_databaseId = secret.evaluation_db("database_id")
-        self.eval_data = N_API.ConnectNotionDB(self.duration_databaseId, self.token_key)
-        
+        EVAL = N_API.ConnectNotionDB(self.eval_databaseId, self.token_key)
+        self.eval_data = EVAL.retrieve_data()
+
         # Get Duration Data -> dur_data
-        self.duration_databaseId = secret.durationDB('databaseId')
-        self.dur_data = N_API.ConnectNotionDB(self.task_databaseId, self.token_key)
-    
-    # Get Evaluation Data from a separate database 
-    def get_evaluation_data(self, data, projects):
-        projects.pop(-1)        
-        eval_data = oed.get_evaluation_data(projects, data)
-        return eval_data
-    
+        self.duration_databaseId = secret.durationDB('database_id')
+        DUR = N_API.ConnectNotionDB(self.duration_databaseId, self.token_key)
+        self.dur_data = DUR.retrieve_data()    
+
+        self.headers = {
+            "Authorization": "Bearer " + self.token_key,
+            "Content-Type": "application/json",
+            "Notion-Version": "2021-05-13"
+        }
     
     # Overwrite the existing excel file with an updated data for duration_EST data & self-evaluation data
-    def download_evaluationCSV(self, eval_data):
-        date = eval_data['Date'][0].split('/')
-        month = date[0]
-        year = date[-1][-2:]
+    def download_evaluationCSV(self):
+
+        # String Manipulation to create file names
+        date = self.eval_data['Date'][0].split('-')
+        month = date[1]
+        year = date[0][-2:]
         file_name = month + year + '.csv'
         
         print('\n****************** Update Evaluation CSV Data ******************')
         
-        eval_data.to_csv("C:\\NotionUpdate\\progress\\notion_automation\\month_Data\\%s" % file_name, index=False)
+        self.eval_data.to_csv("C:\\NotionUpdate\\progress\\notion_automation\\month_Data\\%s" % file_name, index=False)
         # Download to my D drive if plugged in 
         try:
-            eval_data.to_csv("D:\\Personal\\progress\\notion_automation\\month_Data\\%s" % file_name, index=False)
+            self.eval_data.to_csv("D:\\Personal\\progress\\notion_automation\\month_Data\\%s" % file_name, index=False)
         except:
             pass
         print('Update Completed\n\n\n\n')
@@ -99,7 +101,7 @@ class Connect_Notion:
         
     
     # Update a block(task) to today's column
-    def updateTask_to_today(self, pageId, headers):
+    def updateTask_to_today(self, pageId):
         path = f"https://api.notion.com/v1/pages/{pageId}"
     
         updateData_to_next = {
@@ -113,10 +115,10 @@ class Connect_Notion:
             }
         
         response = requests.request("PATCH", path, 
-                                    headers=headers, data=json.dumps(updateData_to_next))
+                                    headers=self.headers, data=json.dumps(updateData_to_next))
     
     # Update a block(task) from today's column to corresponding columns
-    def updateTask_to_others(self, pageId, headers, category):
+    def updateTask_to_others(self, pageId, category):
         path = f"https://api.notion.com/v1/pages/{pageId}"
     
         updateData_to_waitlist = {
@@ -130,23 +132,23 @@ class Connect_Notion:
             }
         
         response = requests.request("PATCH", path, 
-                                    headers=headers, data=json.dumps(updateData_to_waitlist))
+                                    headers=self.headers, data=json.dumps(updateData_to_waitlist))
     
 
 
     # Update Schedule
-    def update_Schedule(self, proj_data):
+    def update_Schedule(self):
         today = CNotion.get_today("day")
         today_date = CNotion.get_today("date")
         weekday = CNotion.get_today("weekday")
         
         print("****************** Updating Today's Schedule ******************")
-        for block in range(len(proj_data['Name'])):
+        for block in range(len(self.task_data['Name'])):
             
             # If it's past 1:00 pm, don't reschedule it again
-                # Since I may have made some modifications, which needs to be fixed
+            ## Fix any changes made to the automated schedule
             if CNotion.is_time_between(time_time(13,00),time_time(2,00)) == True:
-                return proj_data['Category_current'].count("Today")
+                return self.task_data['Status'].count("Today")
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
@@ -157,34 +159,39 @@ class Connect_Notion:
                     
             
             # Check CASE 1
-            block_dates = proj_data["Date"][block]
+            block_dates = self.task_data["Date"][block]
+            
+            # np.nan is passed as float, so change it into a string.
+            if isinstance(block_dates, float):
+                block_dates = str(block_dates)
+
             if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
-                if proj_data["Category_current"][block] != "Today":
-                    CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
-                    print("[%s] Block Updated" % proj_data["Name"][block])
+                if self.task_data["Status"][block] != "Today":
+                    CNotion.updateTask_to_today(self.task_data["pageId"][block])
+                    print("[%s] Block Updated" % self.task_data["Name"][block])
 
             # Check CASE 2
             # If the block is incorrectly in Today's column send it back to its category(column)
             else:
                 # disposable blocks(Used for one day: popped up meeting or laundry etc.)
-                if proj_data['Date'][block] == [] and proj_data['Due Date'][block] == 0:
+                if self.task_data['Date'][block] == [] and self.task_data['Due Date'][block] == 0:
                     pass
                 
-                elif proj_data["Category_current"][block] == "Today" and today_date != proj_data["Due Date"][block]:
-                    CNotion.updateTask_to_others(proj_data["pageId"][block], headers,
-                                                 proj_data["Category"][block])
-                    print("[%s] Block Updated" % proj_data["Name"][block])
+                elif self.task_data["Status"][block] == "Today" and today_date != self.task_data["Due Date"][block]:
+                    CNotion.updateTask_to_others(self.task_data["pageId"][block],
+                                                 self.task_data["Category"][block])
+                    print("[%s] Block Updated" % self.task_data["Name"][block])
             
             # Check CASE 3
-            if today_date == proj_data["Due Date"][block]:
-                if proj_data["Category_current"] != "Today":
-                    CNotion.updateTask_to_today(proj_data["pageId"][block], headers)
-                    print("[%s] Block Updated" % proj_data["Name"][block])
+            if today_date == self.task_data["Due Date"][block]:
+                if self.task_data["Status"] != "Today":
+                    CNotion.updateTask_to_today(self.task_data["pageId"][block])
+                    print("[%s] Block Updated" % self.task_data["Name"][block])
         
         print("\nUpdate Completed\n\n\n\n")
         
         # Return the total number of today's todo lists
-        return proj_data['Category_current'].count("Today")
+        return self.task_data['Status'].value_counts()['Today']
     
                 
     
@@ -229,30 +236,20 @@ class Connect_Notion:
 
 # Schedule my tasks 
 CNotion = Connect_Notion()
-proj_data = CNotion.connect_DB("Task Database")
 
 # Update Schedule
-CNotion.update_Schedule(proj_data)
-
-# Read Evaluation Database in Notion using different database ID
-
-CNotion = Connect_Notion()
-data = CNotion.read_Database(databaseId, headers)
-projects = CNotion.get_projects_titles(data, "Task Database")
-eval_data = CNotion.get_evaluation_data(data, projects)
+CNotion.update_Schedule()
 
 # Update Total Duration Estimate Database
 # Reconnect to get updated database
 
-CNotion = Connect_Notion()
-proj_data = CNotion.connect_DB("Task Database")
 
 ##### Update Duration DB #####
 import notion_durationDB     #
 ##############################
 
 # Download the evaluation data
-CNotion.download_evaluationCSV(eval_data)
+CNotion.download_evaluationCSV()
 
 # Upload Evaluation Visualization 
 CNotion.update_evaluationJPG()
