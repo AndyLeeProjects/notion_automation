@@ -18,10 +18,11 @@ else:
     sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
 from secret import secret
 from myPackage import organize_evaluation_data as oed
-from myPackage import NotionUpdate_API as NAPI
+from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
+import Notion_API as N_API
 
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
@@ -30,134 +31,22 @@ from myPackage import remove_names_git
 
 class Connect_Notion:
     def __init__(self):
-        pass    
-    
-    # Retrieve Database from Notion
-    def read_Database(self, databaseId, headers):
-        readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
-    
-        res = requests.request("POST", readUrl, headers=headers)
-        data = res.json()
-        # print(res.text)
-    
-        with open('./db.json', 'w', encoding='utf8') as f:
-            json.dump(data, f, ensure_ascii=False)
-        
-        return data
-    
-    # Organize & Convert JSON format into dictionary
-    def get_projects_titles(self,data_json, database_name):
-        most_properties = [len(data_json['results'][i]['properties'])
-                                for i in range(len(data_json["results"]))]
-        
-        project_keys = list(data_json["results"][np.argmax(most_properties)]["properties"].keys()) 
-        
-        
-        # When the database is Empty, the variable title will not be read.
-        # Thus, we need to make sure every varaible title is in our projects_key list
-        if database_name == "Task Database":
-            # since we are using 2 different data sets for the same code
-            if "Due Date" not in project_keys and "Meditation (%)" not in project_keys:
-                return project_keys + ["Due Date","pageId"]
-            else:
-                return project_keys + ["pageId"]
-        else:
-            return  ['Duration_EST', 'D_Tasks', 'D_Title', 'pageId']
-            
-                
-    
-    def get_projects_data(self, data, projects):
-        proj_data = {}
-        
-        for p in projects:
-            if p == "Due Date":
-                # Each block's Due Dates
-                due_temp = []
-                for i in range(len(data["results"])):
-                    try:
-                        due_temp.append(data['results'][i]['properties']['Due Date']['date']['start'])
-                    except:
-                        due_temp.append(0)
-                
-                proj_data[p] = due_temp
-                
-            elif p == "Date":
-                # Each block's Dates(Mon,Tue,...,Sun)
-                date_temp = []
-                for i in range(len(data["results"])):
-                    block = data['results'][i]['properties']['Date']['multi_select']
-                    temp_p = [block[date]["name"]
-                              for date in range(len(block))]
-                    date_temp.append(temp_p)
-                proj_data[p] = date_temp
-            
-            elif p == "pageId":
-                proj_data[p] = [data['results'][i]['id']
-                                    for i in range(len(data["results"]))]
-            
-            elif p == "To do":
-                proj_data[p] = [data['results'][i]['properties']['To do']['checkbox']
-                                    for i in range(len(data["results"]))]
-            
-            elif p == "Name":
-                names = []
-                for i in range(len(data["results"])):
-                    try:
-                        names.append(data['results'][i]['properties']['Name']['title'][0]['text']['content'].split(': ')[1])
-                    except:
-                        names.append(data['results'][i]['properties']['Name']['title'][0]['text']['content'])
-                proj_data["Name"] = names
-                proj_data["Category"] = [data['results'][i]['properties']['Name']['title'][0]['text']['content'].split(': ')[0]
-                                    for i in range(len(data["results"]))]
-                proj_data["Category_current"] = [data['results'][i]['properties']['Status 1']['select']['name']
-                                    for i in range(len(data["results"]))]
-            
-            elif p == "D_Title":
-                proj_data[p] = [data['results'][i]['properties'][p]['title'][0]['plain_text']
-                                    for i in range(len(data["results"]))]
-            
-            elif p == "D_Tasks":
-                task_temp = []
-                for i in range(len(data["results"])):
-                    try:
-                        task_temp.append(data['results'][i]['properties'][p]['number'])
-                    except:
-                        task_temp.append(0)
-                proj_data[p] = task_temp 
-                                    
-            # Organize the duration data for each task/ block
-                # the data is recorded as '1hr' or '30min' so we need to unify them into minute elements
-            elif p == "Duration_EST":
-                duration_temp = []
-                try:
-                    for i in range(len(data["results"])):
-                        try:
-                            duration = data['results'][i]['properties']['Duration_EST']['select']['name']
-                            if 'hr' in duration:
-                                duration = int(duration.strip('hr'))*60
-                            else:
-                                duration = int(duration.strip('min'))
-                            duration_temp.append(duration)
-                        except:
-                            duration_temp.append(0)
-                except:
-                    duration_temp = [0]*3
-                proj_data[p] = duration_temp                                    
-            
-            else:
-                pass
-                
+        # Get Token Key
+        self.token_key = secret.notion_API("token_key")
 
-        return proj_data
-    
-    # Connects & Organizes Data
-        # Runs Everything above
-    def connect_DB(self, database_name):
-        data = CNotion.read_Database(databaseId, headers)
-        projects = CNotion.get_projects_titles(data,database_name)
-        proj_data = CNotion.get_projects_data(data, projects)
-        return proj_data
 
+        # Get Task Schedule Data -> task_data
+        self.task_databaseId = secret.task_scheduleDB("database_id")
+        self.task_data = N_API.ConnectNotionDB(self.eval_databaseId, self.token_key)
+
+        # Get Evaluation Data -> eval_data
+        self.eval_databaseId = secret.evaluation_db("database_id")
+        self.eval_data = N_API.ConnectNotionDB(self.duration_databaseId, self.token_key)
+        
+        # Get Duration Data -> dur_data
+        self.duration_databaseId = secret.durationDB('databaseId')
+        self.dur_data = N_API.ConnectNotionDB(self.task_databaseId, self.token_key)
+    
     # Get Evaluation Data from a separate database 
     def get_evaluation_data(self, data, projects):
         projects.pop(-1)        
@@ -301,9 +190,9 @@ class Connect_Notion:
     
     def update_evaluationJPG(self):
         print("****************** Uploading evaluation.jpg file ******************")
-        data_eval = NAPI.nsync.query_databases()
-        projects_eval = NAPI.nsync.get_projects_titles(data_eval)
-        projects_data_eval = pd.DataFrame(NAPI.nsync.get_projects_data(data_eval,projects_eval))
+        data_eval = N_Update.nsync.query_databases()
+        projects_eval = N_Update.nsync.get_projects_titles(data_eval)
+        projects_data_eval = pd.DataFrame(N_Update.nsync.get_projects_data(data_eval,projects_eval))
         projects_data_eval = projects_data_eval.rename(
             columns={'*Finished': 'Finished', '*Multiple (1~5)': 'Multiple','*Phone pickups':'Phone pickups',
                     '*Screen time':'Screen time','Drink (%)':'Drink %', 'Drink? (over 3 beer)':'Drink',
@@ -317,7 +206,7 @@ class Connect_Notion:
         pMon.monthly_eval(projects_data_eval, update_window = True) # Replace it with projects_data_eval
         if os.name != 'posix':
             cb.update_Background() # Change the windows background with the self-evaluation IMG 
-        #NAPI.uploadEvaluationJPG()
+        #N_Update.uploadEvaluationJPG()
         print('Upload Completed\n\n\n\n')
         
         # Save to D Drive (if plugged in) for further statistical analysis
@@ -337,16 +226,7 @@ class Connect_Notion:
             return check_time >= begin_time or check_time <= end_time
     
 
-        
 
-databaseId = secret.todo_db("database_id")
-token = secret.notion_API("token_key")
-headers = {
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json",
-    "Notion-Version": "2021-05-13"
-}
-    
 # Schedule my tasks 
 CNotion = Connect_Notion()
 proj_data = CNotion.connect_DB("Task Database")
@@ -355,7 +235,7 @@ proj_data = CNotion.connect_DB("Task Database")
 CNotion.update_Schedule(proj_data)
 
 # Read Evaluation Database in Notion using different database ID
-databaseId = secret.evaluation_db("database_id")
+
 CNotion = Connect_Notion()
 data = CNotion.read_Database(databaseId, headers)
 projects = CNotion.get_projects_titles(data, "Task Database")
@@ -363,7 +243,7 @@ eval_data = CNotion.get_evaluation_data(data, projects)
 
 # Update Total Duration Estimate Database
 # Reconnect to get updated database
-databaseId = secret.todo_db("database_id")
+
 CNotion = Connect_Notion()
 proj_data = CNotion.connect_DB("Task Database")
 
