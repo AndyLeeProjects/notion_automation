@@ -105,7 +105,7 @@ class Connect_Notion:
     
         updateData_to_next = {
             "properties": {
-                "Status 1": {
+                "Status": {
                     "select": {
                                 "name": "Today"
                         }
@@ -122,7 +122,7 @@ class Connect_Notion:
     
         updateData_to_waitlist = {
             "properties": {
-                "Status 1": {
+                "Status": {
                     "select": {
                                 "name": category
                         }
@@ -164,34 +164,34 @@ class Connect_Notion:
                     
             
             # Check CASE 1
-            block_dates = self.task_data["Date"][block]
+            block_dates = self.task_data["Date"].iloc[block]
             
             # np.nan is passed as float, so change it into a string.
             if isinstance(block_dates, float):
                 block_dates = str(block_dates)
 
             if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
-                if self.task_data["Status"][block] != "Today":
-                    CNotion.updateTask_to_today(self.task_data["pageId"][block])
-                    print("[%s] Block Updated" % self.task_data["Name"][block])
+                if self.task_data["Status"].iloc[block] != "Today":
+                    CNotion.updateTask_to_today(self.task_data["pageId"].iloc[block])
+                    print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
 
             # Check CASE 2
             # If the block is incorrectly in Today's column send it back to its category(column)
             else:
                 # disposable blocks(Used for one day: popped up meeting or laundry etc.)
-                if self.task_data['Date'][block] == [] and self.task_data['Due Date'][block] == 0:
+                if self.task_data['Date'].iloc[block] == [] and self.task_data['Due Date'].iloc[block] == 0:
                     pass
                 
-                elif self.task_data["Status"][block] == "Today" and today_date != self.task_data["Due Date"][block]:
-                    CNotion.updateTask_to_others(self.task_data["pageId"][block],
-                                                 self.task_data["Category"][block])
-                    print("[%s] Block Updated" % self.task_data["Name"][block])
+                elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block]:
+                    CNotion.updateTask_to_others(self.task_data["pageId"].iloc[block],
+                                                 self.task_data["Category"].iloc[block])
+                    print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             # Check CASE 3
-            if today_date == self.task_data["Due Date"][block]:
-                if self.task_data["Status"] != "Today":
-                    CNotion.updateTask_to_today(self.task_data["pageId"][block])
-                    print("[%s] Block Updated" % self.task_data["Name"][block])
+            if today_date == self.task_data["Due Date"].iloc[block]:
+                if self.task_data["Status"].iloc[block] != "Today":
+                    CNotion.updateTask_to_today(self.task_data["pageId"].iloc[block])
+                    print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             #Connect_NotionAPI.printProgressBar(block + 1, l, prefix = 'Task Update Progress: ', suffix = 'Complete')
         
