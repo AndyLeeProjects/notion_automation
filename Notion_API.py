@@ -49,7 +49,7 @@ retrieve_data:
 
 
 class ConnectNotionDB:
-    def __init__(self, database_id, token_key, filters = None):
+    def __init__(self, database_id, token_key, filters:dict = None):
         """
         Initial Setup
 
@@ -116,11 +116,11 @@ class ConnectNotionDB:
 
                 data_hidden = requests.post(
                     readUrl, json=self.filters, headers=self.headers, data=data_hidden).json()
-
                 self.json["results"] += data_hidden["results"]
                 next_cur = data_hidden['next_cursor']
                 page_num += 1
                 if next_cur is None:
+                    print(len(self.json['results']))
                     break
         except:
             pass
