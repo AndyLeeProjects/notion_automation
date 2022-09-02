@@ -2,8 +2,8 @@
 Created on Mon Apr  4 22:12:20 2022
 @author: anddy
 """
-import sys
-import os
+import sys, os
+from datetime import datetime
 if os.name == 'posix':
     sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
     DIR = r'/Users/andylee/Desktop/git_prepFile/notion_automation/month_Data'
@@ -35,9 +35,8 @@ def remove_names_month():
     # Set beginning year & month (When Data Collection Began)
     year = 20
     month = 9
-    # Subtracting 1 for all_dat.csv
-    dir_len = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
-    c = 1
+    currentYear = int(str(datetime.today().year)[2:])
+    currentMonth = datetime.today().month
     while True:
         file_name = str(month).zfill(2) + str(year) + '.csv'
         try:
@@ -61,13 +60,11 @@ def remove_names_month():
             except:
                 pass
             print("%s/%s Name column deleted & saved" % (month,year))
-            c += 1
+
         except FileNotFoundError:
-            if dir_len == c:
-                print("Completed\n\n")
-                break
-            else:
-                pass
+            pass
+        if month == currentMonth and year == currentYear or year > currentYear:
+            break
         if month > 12:
             year += 1
             month = 0

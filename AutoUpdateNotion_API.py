@@ -260,8 +260,9 @@ class Connect_Notion:
     
     def execute_all(self):
         # Update Schedule
+        print("check 1")
         self.update_Schedule()
-
+        print("check 2")
         ##### Update Duration DB #####
         import notion_durationDB 
 
