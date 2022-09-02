@@ -82,8 +82,8 @@ class NotionSync:
             if task % 4 == 0:
                 progress += ' '
         self.estimates += '%s\n'%(progress)
-        total_todo_today = len(todo_data[todo_data['Status 1'] == 'Today']['To do'])                
-        total_todo_checked = sum(todo_data[todo_data['Status 1'] == 'Today']['To do'])                
+        total_todo_today = len(todo_data[todo_data['Status'] == 'Today']['To do'])                
+        total_todo_checked = sum(todo_data[todo_data['Status'] == 'Today']['To do'])                
         
         progress += '\nProgress: '
         for task in range(total_todo_today):
@@ -244,7 +244,7 @@ class NotionSync:
     def execute_all(self):
         # To do list database
         # Compute the Estimations & Rest of the Evaluation variables
-        todo_databaseId = secret.todo_db('database_id')
+        todo_databaseId = secret.task_scheduleDB('database_id')
         self.get_morning_routine()
         self.get_TotalEstimate(todo_databaseId)
 

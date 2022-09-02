@@ -12,7 +12,12 @@ page_token = None
 while True:
   events = service.events().list(calendarId='anddy0622@gmail.com', pageToken=page_token).execute()
   for event in events['items']:
-    print(event['summary'])
+    try:
+      print(event)
+    except:
+      pass
   page_token = events.get('nextPageToken')
   if not page_token:
     break
+
+
