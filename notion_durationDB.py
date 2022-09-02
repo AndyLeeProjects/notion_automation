@@ -193,16 +193,23 @@ class Connect_Notion:
 
         new_row['Date'] = today_date
             
+        
+        
 
         if new_row['Date'][0] in list(duration_df['Date']):
             
             if new_row['fin_numTasks'][0] <= duration_df['fin_numTasks'][0]:
                 pass
+            elif CNotion.is_time_between(time_time(6,00),time_time(11,59)) == True:
+                # Drop the last index & add the new row
+                duration_df = duration_df.drop([duration_df.index[-1]])
+                duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)
+                duration_df.to_csv(duration_path1)
             else:
                 if new_row['Date'][0] in list(duration_df['Date']) and new_row['fin_numTasks'][0] > duration_df['fin_numTasks'][0]:
+                    # Drop the last index & add the new row
                     duration_df = duration_df.drop([duration_df.index[-1]])
                     duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)
-                    
                     duration_df.to_csv(duration_path1)
         else:
             duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)

@@ -82,6 +82,11 @@ class NotionSync:
         # Compare "total_checked" and "routine_total_checked" to update the newest values
         if new_row['Date'][0] in list(routine['Date']) and total_checked <= routine_total_checked:
             pass
+        elif NotionSync.is_time_between(time(6,00),time(11,59)) == True:
+                # Drop the last index & add the new row
+                routine = routine.drop([routine.index[-1]])
+                routine = pd.concat([routine, new_row], ignore_index = True, axis = 0)
+                routine.to_csv(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv', encoding='utf-8')
         else:
             if new_row['Date'][0] in list(routine['Date']) and total_checked > routine_total_checked:
                 routine = routine.drop([routine.index[-1]])
