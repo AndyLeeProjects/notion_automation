@@ -134,6 +134,26 @@ class Connect_Notion:
                                     headers=self.headers, data=json.dumps(updateData_to_waitlist))
     
 
+    def createTask(self):
+        path = "https://api.notion.com/v1/pages"
+
+        newPageData = {
+            "parent": {"database_id": self.task_databaseId},
+            "properties": {
+                "Name": [
+                    {"type": "text",
+                    "text":{
+                        "content": "TEST"
+                    }}
+                ],
+                "Due Date": {
+                    "start": "2021-10-01T11:00:00.000-04:00"
+                }
+            }
+        }
+
+        response = requests.post(path, json=newPageData, headers=self.headers)
+
 
     # Update Schedule
     def update_Schedule(self):
@@ -151,9 +171,9 @@ class Connect_Notion:
             
             # If it's past 1:00 pm, don't reschedule it again
             ## Fix any changes made to the automated schedule
-            #if CNotion.is_time_between(time_time(13,00),time_time(2,00)) == True:
-            #    print('\n\n')
-            #    return self.task_data['Status'].value_counts()["Today"]
+            if CNotion.is_time_between(time_time(13,00),time_time(2,00)) == True:
+               print('\n\n')
+               return self.task_data['Status'].value_counts()["Today"]
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
@@ -184,7 +204,7 @@ class Connect_Notion:
                 
                 elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block]:
                     CNotion.updateTask_to_others(self.task_data["pageId"].iloc[block],
-                                                 self.task_data["Category"].iloc[block])
+                                                 self.task_data["Status"].iloc[block])
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             # Check CASE 3
