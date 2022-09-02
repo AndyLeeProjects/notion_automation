@@ -22,6 +22,7 @@ from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
 from Notion_API import ConnectNotionDB as Connect_NotionAPI
+from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
 
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
@@ -134,7 +135,7 @@ class Connect_Notion:
                                     headers=self.headers, data=json.dumps(updateData_to_waitlist))
     
 
-    def createTask(self):
+    def createTask(self, task_name, task_duration):
         path = "https://api.notion.com/v1/pages"
 
         newPageData = {
@@ -143,16 +144,60 @@ class Connect_Notion:
                 "Name": [
                     {"type": "text",
                     "text":{
-                        "content": "TEST"
+                        "content": task_name
                     }}
                 ],
-                "Due Date": {
-                    "start": "2021-10-01T11:00:00.000-04:00"
-                }
+                "Duration_EST": [
+                    {"name": task_duration}
+                ]
             }
         }
 
         response = requests.post(path, json=newPageData, headers=self.headers)
+
+    def update_ScheduleCalendar(self):
+        
+        # Connect to Google Calendar API 
+        CLIENT_SECRET_FILE = secret.GoogleCalendar_connect('credentials')
+        calendarId = secret.GoogleCalendar_connect('calendarId')
+        GoogleCal = CalendarAPI(CLIENT_SECRET_FILE = CLIENT_SECRET_FILE, calendar_id=calendarId)
+
+        # Get today's tasks
+        self.today_tasks = GoogleCal.execute_all("today_tasks")
+        
+        # Get all upcoming tasks
+        self.upcoming_tasks = GoogleCal.execute_all("upcoming_tasks")
+
+        # Sort the today's schedules that were created by me
+        my_schedule = [self.today_tasks.index[i]
+                        for i in range(len(self.today_tasks))
+                        if calendarId ==  self.today_tasks['creator'].iloc[i]]
+        my_schedule = self.today_tasks.loc[my_schedule]
+        
+        # Get Duration of each task
+        for task in range(len(self.today_tasks['summary'])):
+            start_time = self.today_tasks['start'].iloc[task].split('T')[1].split(':')
+            start_hr = int(start_time[0])
+            start_min = int(start_time[1])
+            end_time = self.today_tasks['end'].iloc[task].split('T')[1].split(':')
+            end_hr = int(end_time[0])
+            end_min = int(end_time[1])
+
+            # Get task name
+            task_name = self.today_tasks['summary'].iloc[task]
+
+            # Get task duration
+            task_duration = (end_hr * 60 + end_min) - (start_hr * 60 + start_min)
+            
+            # convert the duration into -hr -min format
+            if task_duration % 60 == 0:
+                task_duration = f'{task_duration // 60}hr'
+            elif task_duration < 60:
+                task_duration = f'{task_duration % 60}min'
+            else:
+                task_duration = f'{task_duration // 60}hr {task_duration % 60}min'
+            
+            #self.createTask(task_name, task_duration)
 
 
     # Update Schedule
@@ -260,9 +305,7 @@ class Connect_Notion:
     
     def execute_all(self):
         # Update Schedule
-        print("check 1")
         self.update_Schedule()
-        print("check 2")
         ##### Update Duration DB #####
         import notion_durationDB 
 
@@ -276,8 +319,7 @@ class Connect_Notion:
 # Schedule my tasks 
 CNotion = Connect_Notion()
 CNotion.execute_all()
-
-
+CNotion.update_ScheduleCalendar()
 
 
 

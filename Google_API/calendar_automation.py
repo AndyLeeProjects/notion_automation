@@ -57,7 +57,6 @@ class GoogleCalendarAPI:
             
             # Call data 
             events = service.events().list(calendarId='anddy0622@gmail.com', pageToken=page_token).execute()
-            print(events['items'][0].keys())
             for event in events['items']:
 
                 try:
@@ -78,7 +77,7 @@ class GoogleCalendarAPI:
         """
         organize_CalendarData(): This method organizes the list of JSON data into a nice dataframe
         """
-        keys = ['id','kind', 'summary', 'status', 'start', 'end', 'timeZone', 'attendees', 'conferenceData', 'recurringEventId', 'sequence']
+        keys = ['id','kind', 'summary', 'creator', 'organizer', 'status', 'start', 'end', 'timeZone', 'attendees', 'conferenceData', 'recurringEventId', 'sequence']
         self.calendar_data = {}
 
         # Get today's date
@@ -92,7 +91,6 @@ class GoogleCalendarAPI:
                         except:
                             self.calendar_data.setdefault(key, []).append(np.nan)
             except KeyError:
-                print(event)
                 pass
         
         self.calendar_data = pd.DataFrame(self.calendar_data)
@@ -105,11 +103,11 @@ class GoogleCalendarAPI:
             list: list of today's tasks (pandas DF)
         """
         currentDay = str(datetime.today())[:10]
-        today_tasks = [self.calendar_data.loc[[date]]
+        today_tasks = [self.calendar_data.index[date]
                         for date in range(len(self.calendar_data))
                         if self.calendar_data['start'].iloc[date][:10] == currentDay]
         
-        return today_tasks    
+        return self.calendar_data.loc[today_tasks]
         
 
 
@@ -133,14 +131,31 @@ class GoogleCalendarAPI:
             return event[key][0]['responseStatus']
         elif key == 'conferenceData':
             return event[key]['entryPoints'][0]['uri']
+        elif key == 'creator' or key == 'organizer':
+            return event[key]['email']
         else:
-            return event[key]  
+            return event[key]
+    
+    def execute_all(self, get_data:str = "today_tasks"):
+        """
+        execute_all(): Executes all codes above and returns data depending on the users' preferences:
+            - today tasks
+            - upcoming tasks
+
+        Args:
+            get_data (str, optional): _description_. Defaults to "today_tasks".
+
+        Returns:
+            dataframe: today's tasks or upcoming tasks in a dataframe format
+        """
+        self.get_CalendarData()
+        upcoming_tasks = self.organize_CalendarData()
+        today_tasks = self.get_todayTasks()
+
+        if get_data == "today_tasks":
+            return today_tasks
+        else:
+            return upcoming_tasks
+        
 
 
-CLIENT_SECRET_FILE = secret.GoogleCalendar_connect('credentials')
-calendarId = secret.GoogleCalendar_connect('calendarId')
-GoogleCal = GoogleCalendarAPI(CLIENT_SECRET_FILE = CLIENT_SECRET_FILE, calendar_id=calendarId)
-GoogleCal.get_CalendarData()
-data = GoogleCal.organize_CalendarData()
-dataToday = GoogleCal.get_todayTasks()
-print(data)
