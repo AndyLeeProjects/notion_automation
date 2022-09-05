@@ -96,8 +96,6 @@ class Connect_Notion:
         else:
             return dt_string
         
-
-
     def update_ScheduleCalendar(self):
         # Connect to Google Calendar API 
         CLIENT_SECRET_FILE = secret.GoogleCalendar_connect('credentials')
@@ -141,34 +139,32 @@ class Connect_Notion:
 
             # If the task name exists in the Notion Task DB, then Update
             ## Else, create a new task
-            if task_name in list(self.task_data['Name']):
-                print("< ", task_name,", ", task_duration, " >  Updated")
-                print()
-                update_Notion("Duration_EST", {"select":{"name":task_duration}}, 
-                              self.task_data[self.task_data['Name'] == task_name]['pageId'].iloc[0], headers = self.headers)
-            else:
-                print("< ", task_name,", ", task_duration, " >  Created")
-                print()
-                create_TodayTask(task_name, task_duration, self.task_databaseId, self.headers)
+            ## --> If the time is between 12:00am and 4:00am, no updates needed
+            if self.is_time_between(time_time(23,59),time_time(4,00)) == False:
+                if task_name in list(self.task_data['Name']):
+                    print("< ", task_name,", ", task_duration, " >  Updated")
+                    print()
+                    update_Notion("Duration_EST", {"select":{"name":task_duration}}, 
+                                self.task_data[self.task_data['Name'] == task_name]['pageId'].iloc[0], headers = self.headers)
+                else:
+                    print("< ", task_name,", ", task_duration, " >  Created")
+                    print()
+                    create_TodayTask(task_name, task_duration, self.task_databaseId, self.headers)
 
 
     # Update Schedule
     def update_Schedule(self):
-        today = CNotion.get_today("day")
-        today_date = CNotion.get_today("date")
-        weekday = CNotion.get_today("weekday")
+        today = self.get_today("day")
+        today_date = self.get_today("date")
+        weekday = self.get_today("weekday")
         
         print("****************** Updating Today's Schedule ******************")
-
-        # Set up progress bar variables
-        l = len(self.task_data['Name'])
-        #Connect_NotionAPI.printProgressBar(0, l, prefix = 'Task Update Progress: ', suffix = 'Complete')
 
         for block in range(len(self.task_data['Name'])):
             
             # If it's past 1:00 pm, don't reschedule it again
             ## Fix any changes made to the automated schedule
-            if CNotion.is_time_between(time_time(13,00),time_time(2,00)) == True:
+            if self.is_time_between(time_time(13,00),time_time(2,00)) == True:
                print('\n\n')
                return self.task_data['Status'].value_counts()["Today"]
             
@@ -181,6 +177,8 @@ class Connect_Notion:
                     
             
             # Check CASE 1
+            # In the case block_dates is np.nan, change the type to str (from float)
+            ## block_dates example: ['Wed', 'Thur', 'Sat', 'Sun']
             block_dates = self.task_data["Date"].iloc[block]
             
             # np.nan is passed as float, so change it into a string.
@@ -196,11 +194,14 @@ class Connect_Notion:
             # If the block is incorrectly in Today's column send it back to its category(column)
             else:
                 # disposable blocks(Used for one day: popped up meeting or laundry etc.)
-                if self.task_data['Date'].iloc[block] == [] and self.task_data['Due Date'].iloc[block] == 0:
+                if str(self.task_data['Date'].iloc[block]) == str(np.nan) and str(self.task_data['Due Date'].iloc[block]) == str(np.nan):
                     pass
                 
-                elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block]:
-                    update_Notion("Status", {"select": {"name": self.task_data["Status"].iloc[block]}} , self.task_data["pageId"].iloc[block], self.headers)
+                # Send them back to its own category 
+                ## Code to get the Category Name --> self.task_data["Name"].iloc[block].split(':')[0]
+                elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block] and \
+                    today not in block_dates:
+                    update_Notion("Status", {"select": {"name": self.task_data["Name"].iloc[block].split(':')[0]}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             # Check CASE 3
@@ -209,7 +210,6 @@ class Connect_Notion:
                     update_Notion("Status", {"select": {"name": "Today"}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
-            #Connect_NotionAPI.printProgressBar(block + 1, l, prefix = 'Task Update Progress: ', suffix = 'Complete')
         
         print("\nUpdate Completed\n\n\n\n")
         
@@ -268,7 +268,7 @@ class Connect_Notion:
         self.download_evaluationCSV()
 
         # Upload Evaluation Visualization 
-        self.update_evaluationJPG()
+        #self.update_evaluationJPG()
 
 
 # Schedule my tasks 
