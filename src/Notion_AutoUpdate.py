@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Apr  2 00:48:06 2022
 
-@author: anddy
-"""
 import requests, json
 import numpy as np
 from datetime import datetime
@@ -12,10 +8,10 @@ import calendar
 import pandas as pd
 from datetime import time as time_time
 
-if os.name == 'posix':
-    sys.path.append('/Users/andylee/Desktop/git_prepFile/notion_automation')
-else:
-    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
+# Direct to specified path to use the modules below
+wd=os.getcwd()
+os.chdir(wd)
+
 from secret import secret
 from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
