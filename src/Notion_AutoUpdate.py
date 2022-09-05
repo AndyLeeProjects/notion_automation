@@ -9,7 +9,8 @@ import pandas as pd
 from datetime import time as time_time
 
 # Direct to specified path to use the modules below
-os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+#os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(r"c:\NotionUpdate\progress\notion_automation")
 
 from secret import secret
 from myPackage import NotionUpdate_API as N_Update
@@ -313,7 +314,7 @@ class Connect_Notion:
 
 # Schedule my tasks 
 CNotion = Connect_Notion()
-CNotion.execute_all()
+#CNotion.execute_all()
 CNotion.update_ScheduleCalendar()
 
 

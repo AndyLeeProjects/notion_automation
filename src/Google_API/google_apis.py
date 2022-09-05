@@ -29,9 +29,9 @@ def main():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            sys.path.append('C:\\NotionUpdate\\progress\\notion_automation\\secret')
+            cred_dir = os.path.join(os.path.dirname(__file__), 'credentials.json')
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                cred_dir, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
