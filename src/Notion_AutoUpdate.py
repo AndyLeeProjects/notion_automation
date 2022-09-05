@@ -103,32 +103,55 @@ class Connect_Notion:
         GoogleCal = CalendarAPI(CLIENT_SECRET_FILE = CLIENT_SECRET_FILE, calendar_id=calendarId)
 
         # Get today's tasks
-        self.today_tasks = GoogleCal.execute_all("today_tasks")
+        self.today_tasks_Google = GoogleCal.execute_all("today_tasks")
         
         # Get all upcoming tasks
-        self.upcoming_tasks = GoogleCal.execute_all("upcoming_tasks")
+        self.upcoming_tasks_Google = GoogleCal.execute_all("upcoming_tasks")
 
         # Sort the today's schedules that were created by me (matched by email)
-        my_schedule = [self.today_tasks.index[i]
-                        for i in range(len(self.today_tasks))
-                        if calendarId ==  self.today_tasks['creator'].iloc[i]]
-        my_schedule = self.today_tasks.loc[my_schedule]
+        my_schedule = [self.today_tasks_Google.index[i]
+                        for i in range(len(self.today_tasks_Google))
+                        if calendarId ==  self.today_tasks_Google['creator'].iloc[i]]
+        my_schedule = self.today_tasks_Google.loc[my_schedule]
+
+        # In the case of redundant tasks, accumulate the total duration
+        task_duration_Google = {}
 
         # Get Duration of each task that were created by "me"
-        for task in range(len(my_schedule)):
-            start_time = my_schedule['start'].iloc[task].split('T')[1].split(':')
+        for task in range(len(self.today_tasks_Google)):
+            start_time = self.today_tasks_Google['start'].iloc[task].split('T')[1].split(':')
             start_hr = int(start_time[0])
             start_min = int(start_time[1])
-            end_time = my_schedule['end'].iloc[task].split('T')[1].split(':')
+            end_time = self.today_tasks_Google['end'].iloc[task].split('T')[1].split(':')
             end_hr = int(end_time[0])
             end_min = int(end_time[1])
 
             # Get task name
-            task_name = my_schedule['summary'].iloc[task]
+            task_name_Google = self.today_tasks_Google['summary'].iloc[task]
+
+            # Personal Filter
+            if "Andy Lee and" in task_name_Google:
+                task_name_Google = task_name_Google.replace(" | Other", "")
+                task_name_Google = task_name_Google.replace("Andy Lee and ", "Pathrise: Meeting with ")
 
             # Get task duration
             task_duration = (end_hr * 60 + end_min) - (start_hr * 60 + start_min)
+
+            # Accumulate Duration (in case of redundancy of schedules)
+            try:
+                task_duration_Google[task_name_Google] += task_duration
+            except KeyError:
+                task_duration_Google[task_name_Google] = task_duration
+
+            # Redefine below variables for the simplicity
+            task_duration = task_duration_Google[task_name_Google]
+            if int(start_time[0]) // 12 == 0:
+                start_time = start_time[0] + ":" + start_time[1] + " am"
+            else:
+                start_time = str(int(start_time[0])% 12) + ":" + start_time[1] + " pm"
             
+            meeting_url = self.today_tasks_Google['conferenceData'].iloc[task]
+
             # convert the duration into -hr -min format
             if task_duration % 60 == 0:
                 task_duration = f'{task_duration // 60}hr'
@@ -141,15 +164,33 @@ class Connect_Notion:
             ## Else, create a new task
             ## --> If the time is between 12:00am and 4:00am, no updates needed
             if self.is_time_between(time_time(23,59),time_time(4,00)) == False:
-                if task_name in list(self.task_data['Name']):
-                    print("< ", task_name,", ", task_duration, " >  Updated")
+
+                # Case where the task in Google Calendar is ALREADY IN the Notion Task DB
+                ## Modify the total duration EST
+                if task_name_Google in list(self.task_data['Name']):
+                    print("<", task_name_Google,", ", task_duration, ">  Updated")
                     print()
-                    update_Notion("Duration_EST", {"select":{"name":task_duration}}, 
-                                self.task_data[self.task_data['Name'] == task_name]['pageId'].iloc[0], headers = self.headers)
-                else:
-                    print("< ", task_name,", ", task_duration, " >  Created")
-                    print()
-                    create_TodayTask(task_name, task_duration, self.task_databaseId, self.headers)
+                    if str(meeting_url) != str(np.nan):
+                        # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & URL
+                        update_Notion({"Duration_EST": {"select":{"name":task_duration}}, 
+                                    "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
+                                                           {"type": "text", "text": {"content": start_time}}]},
+                                    "web 1": {"url": meeting_url}}, 
+                                    self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
+                    else:
+                        # Change the Duration_EST (to task_duration) & Starting Time (to start_time)
+                        update_Notion({"Duration_EST": {"select":{"name":task_duration}}, 
+                                    "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
+                                                           {"type": "text", "text": {"content": start_time}}]}}, 
+                                    self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
+
+                # Case where the task in Google Calendar is NOT IN the Notion Task DB
+                ## Create a new task in Notion Task DB
+                ### status shows my confirm status on the schedule
+                elif self.today_tasks_Google['status'].iloc[task] == 'confirmed':
+                    print("<", task_name_Google,", ", task_duration, ">  Created")
+                    create_TodayTask(task_name_Google, task_duration, self.task_databaseId, start_time,
+                                    meeting_url, self.headers)
 
 
     # Update Schedule
@@ -187,7 +228,7 @@ class Connect_Notion:
 
             if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
                 if self.task_data["Status"].iloc[block] != "Today":
-                    update_Notion("Status", {"select": {"name": "Today"}} , self.task_data["pageId"].iloc[block], self.headers)
+                    update_Notion({"Status":{"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
 
             # Check CASE 2
@@ -201,13 +242,13 @@ class Connect_Notion:
                 ## Code to get the Category Name --> self.task_data["Name"].iloc[block].split(':')[0]
                 elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block] and \
                     today not in block_dates:
-                    update_Notion("Status", {"select": {"name": self.task_data["Name"].iloc[block].split(':')[0]}} , self.task_data["pageId"].iloc[block], self.headers)
+                    update_Notion({"Status":{"select": {"name": self.task_data["Name"].iloc[block].split(':')[0]}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             # Check CASE 3
             if today_date == self.task_data["Due Date"].iloc[block]:
                 if self.task_data["Status"].iloc[block] != "Today":
-                    update_Notion("Status", {"select": {"name": "Today"}} , self.task_data["pageId"].iloc[block], self.headers)
+                    update_Notion({"Status": {"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
         

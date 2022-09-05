@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests, json
+import numpy as np
 
-def update_Notion(name: str, content, pageId: str, headers):
+def update_Notion(content, pageId: str, headers):
     """_summary_
 
     Args:
@@ -17,19 +18,20 @@ def update_Notion(name: str, content, pageId: str, headers):
     update_url = f"https://api.notion.com/v1/pages/{pageId}"
 
     update_properties = {
-        "properties": {
-            name: content
-        }}
+        "properties": content
+        }
 
     response = requests.request("PATCH", update_url,
                                 headers=headers, data=json.dumps(update_properties))
 
 
     
-def create_TodayTask(task_name, task_duration, task_databaseId, headers):
+def create_TodayTask(task_name:str, task_duration, task_databaseId:str, 
+                    start_time:str, meeting_link:str, headers:dict):
     path = "https://api.notion.com/v1/pages"
 
-    newPageData = {
+    # Case 1: Includes the link
+    newPageData_with_link = {
         "parent": {"database_id": task_databaseId},
         "properties": {
             "Name": {
@@ -43,8 +45,39 @@ def create_TodayTask(task_name, task_duration, task_databaseId, headers):
                 ]
             },
             "Duration_EST": {"select": {"name": task_duration}},
-            "Status": {"select": {"name": "Today"}}
+            "Status": {"select": {"name": "Today"}},
+            "web 1": {"url": meeting_link},
+            "Time": {"rich_text": [{"type": "text", "text": {"content": start_time}}]}
         }
     }
 
+
+        # Case 1: Includes the link
+    newPageData_without_link = {
+        "parent": {"database_id": task_databaseId},
+        "properties": {
+            "Name": {
+                "title":[
+                    {
+                        "type": "text",
+                        "text":{
+                            "content": task_name
+                        }
+                    }
+                ]
+            },
+            "Duration_EST": {"select": {"name": task_duration}},
+            "Status": {"select": {"name": "Today"}},
+            "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
+                                   {"type": "text", "text": {"content": start_time}}]}
+            }
+    }
+
+    if str(meeting_link) == str(np.nan):
+        newPageData = newPageData_without_link
+    else:
+        newPageData = newPageData_with_link
+
     response = requests.post(path, json=newPageData, headers=headers)
+    print(response)
+    print()
