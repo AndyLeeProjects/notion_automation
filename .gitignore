@@ -1,4 +1,5 @@
 ._*
+.token*
 .DS_Store
 db.json
 secret/
