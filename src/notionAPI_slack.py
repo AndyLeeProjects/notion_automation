@@ -10,7 +10,7 @@ from datetime import datetime
 sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
 from myPackage import std_risetime
 from secret import secret
-import Notion_API as Notion
+import Connect_Notion as Notion
 
 # ************* DO NOT DELETE *************
 import notion_durationDB
@@ -67,7 +67,7 @@ class NotionSync:
         run = float(self.routine_dic['run'])
 
         
-        import Notion_API as Notion
+        import Connect_Notion as Notion
 
         Notion = Notion.ConnectNotionDB(todo_databaseId, self.token_key)
         todo_data = Notion.retrieve_data()
@@ -112,7 +112,7 @@ class NotionSync:
         '''
 
         # Read Evaluation data to utilize them to estimate present value
-        import Notion_API as Notion 
+        import Connect_Notion as Notion 
         Notion = Notion.ConnectNotionDB(secret.evaluation_db('database_id'), self.token_key)
         evaluation_data = Notion.retrieve_data()
         
@@ -185,7 +185,7 @@ class NotionSync:
     def morning_journal(self, mj_databaseId):
 
         # Get morning journal data using Notion_API.py
-        import Notion_API as Notion
+        import Connect_Notion as Notion
         Notion = Notion.ConnectNotionDB(mj_databaseId, self.token_key)
         mj_data = Notion.retrieve_data()
         today = datetime.today()

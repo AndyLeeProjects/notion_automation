@@ -157,5 +157,3 @@ class GoogleCalendarAPI:
         else:
             return upcoming_tasks
         
-
-

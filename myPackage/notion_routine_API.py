@@ -19,7 +19,7 @@ import mysql.connector as MC
 
 class NotionSync:
     def __init__(self, database_id, token_key):
-        import Notion_API as Notion
+        import Connect_Notion as Notion
         self.database_id = database_id
         self.token_key = token_key    
         

@@ -17,7 +17,8 @@ from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
-from Notion_API import ConnectNotionDB as Connect_NotionAPI
+from Connect_Notion import ConnectNotionDB as Connect_NotionAPI
+from Update_Notion import * # Update_Notion & create_Task
 from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
 
 # Modify the data for git representation(Privacy reasons)
@@ -95,64 +96,9 @@ class Connect_Notion:
         else:
             return dt_string
         
-    
-    # Update a block(task) to today's column
-    def updateTask_to_today(self, pageId):
-        path = f"https://api.notion.com/v1/pages/{pageId}"
-    
-        updateData_to_next = {
-            "properties": {
-                "Status": {
-                    "select": {
-                                "name": "Today"
-                        }
-                    }        
-                }
-            }
-        
-        response = requests.request("PATCH", path, 
-                                    headers=self.headers, data=json.dumps(updateData_to_next))
-    
-    # Update a block(task) from today's column to corresponding columns
-    def updateTask_to_others(self, pageId, category):
-        path = f"https://api.notion.com/v1/pages/{pageId}"
-    
-        updateData_to_waitlist = {
-            "properties": {
-                "Status": {
-                    "select": {
-                                "name": category
-                        }
-                    }        
-                }
-            }
-        
-        response = requests.request("PATCH", path, 
-                                    headers=self.headers, data=json.dumps(updateData_to_waitlist))
-    
 
-    def createTask(self, task_name, task_duration):
-        path = "https://api.notion.com/v1/pages"
-
-        newPageData = {
-            "parent": {"database_id": self.task_databaseId},
-            "properties": {
-                "Name": [
-                    {"type": "text",
-                    "text":{
-                        "content": task_name
-                    }}
-                ],
-                "Duration_EST": [
-                    {"name": task_duration}
-                ]
-            }
-        }
-
-        response = requests.post(path, json=newPageData, headers=self.headers)
 
     def update_ScheduleCalendar(self):
-        
         # Connect to Google Calendar API 
         CLIENT_SECRET_FILE = secret.GoogleCalendar_connect('credentials')
         calendarId = secret.GoogleCalendar_connect('calendarId')
@@ -164,23 +110,23 @@ class Connect_Notion:
         # Get all upcoming tasks
         self.upcoming_tasks = GoogleCal.execute_all("upcoming_tasks")
 
-        # Sort the today's schedules that were created by me
+        # Sort the today's schedules that were created by me (matched by email)
         my_schedule = [self.today_tasks.index[i]
                         for i in range(len(self.today_tasks))
                         if calendarId ==  self.today_tasks['creator'].iloc[i]]
         my_schedule = self.today_tasks.loc[my_schedule]
-        
-        # Get Duration of each task
-        for task in range(len(self.today_tasks['summary'])):
-            start_time = self.today_tasks['start'].iloc[task].split('T')[1].split(':')
+
+        # Get Duration of each task that were created by "me"
+        for task in range(len(my_schedule)):
+            start_time = my_schedule['start'].iloc[task].split('T')[1].split(':')
             start_hr = int(start_time[0])
             start_min = int(start_time[1])
-            end_time = self.today_tasks['end'].iloc[task].split('T')[1].split(':')
+            end_time = my_schedule['end'].iloc[task].split('T')[1].split(':')
             end_hr = int(end_time[0])
             end_min = int(end_time[1])
 
             # Get task name
-            task_name = self.today_tasks['summary'].iloc[task]
+            task_name = my_schedule['summary'].iloc[task]
 
             # Get task duration
             task_duration = (end_hr * 60 + end_min) - (start_hr * 60 + start_min)
@@ -192,8 +138,18 @@ class Connect_Notion:
                 task_duration = f'{task_duration % 60}min'
             else:
                 task_duration = f'{task_duration // 60}hr {task_duration % 60}min'
-            
-            #self.createTask(task_name, task_duration)
+
+            # If the task name exists in the Notion Task DB, then Update
+            ## Else, create a new task
+            if task_name in list(self.task_data['Name']):
+                print("< ", task_name,", ", task_duration, " >  Updated")
+                print()
+                update_Notion("Duration_EST", {"select":{"name":task_duration}}, 
+                              self.task_data[self.task_data['Name'] == task_name]['pageId'].iloc[0], headers = self.headers)
+            else:
+                print("< ", task_name,", ", task_duration, " >  Created")
+                print()
+                create_TodayTask(task_name, task_duration, self.task_databaseId, self.headers)
 
 
     # Update Schedule
@@ -233,7 +189,7 @@ class Connect_Notion:
 
             if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
                 if self.task_data["Status"].iloc[block] != "Today":
-                    CNotion.updateTask_to_today(self.task_data["pageId"].iloc[block])
+                    update_Notion("Status", {"select": {"name": "Today"}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
 
             # Check CASE 2
@@ -244,14 +200,13 @@ class Connect_Notion:
                     pass
                 
                 elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block]:
-                    CNotion.updateTask_to_others(self.task_data["pageId"].iloc[block],
-                                                 self.task_data["Status"].iloc[block])
+                    update_Notion("Status", {"select": {"name": self.task_data["Status"].iloc[block]}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             # Check CASE 3
             if today_date == self.task_data["Due Date"].iloc[block]:
                 if self.task_data["Status"].iloc[block] != "Today":
-                    CNotion.updateTask_to_today(self.task_data["pageId"].iloc[block])
+                    update_Notion("Status", {"select": {"name": "Today"}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             #Connect_NotionAPI.printProgressBar(block + 1, l, prefix = 'Task Update Progress: ', suffix = 'Complete')
@@ -302,6 +257,10 @@ class Connect_Notion:
     def execute_all(self):
         # Update Schedule
         self.update_Schedule()
+
+        # Updates & Creates Tasks from Google Calendar API
+        self.update_ScheduleCalendar()
+
         ##### Update Duration DB #####
         import notion_durationDB 
 
@@ -314,8 +273,7 @@ class Connect_Notion:
 
 # Schedule my tasks 
 CNotion = Connect_Notion()
-#CNotion.execute_all()
-CNotion.update_ScheduleCalendar()
+CNotion.execute_all()
 
 
 
