@@ -1,6 +1,7 @@
 ._*
 .token*
 .DS_Store
+__pycache__
 credentials.json
 db.json
 secret/
