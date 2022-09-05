@@ -1,6 +1,7 @@
 ._*
 .token*
 .DS_Store
+credentials.json
 db.json
 secret/
 token files/
