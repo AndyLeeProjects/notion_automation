@@ -6,3 +6,4 @@ credentials.json
 db.json
 secret/
 token files/
+.vscode
