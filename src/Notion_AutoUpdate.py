@@ -9,8 +9,7 @@ import pandas as pd
 from datetime import time as time_time
 
 # Direct to specified path to use the modules below
-wd=os.getcwd()
-os.chdir(wd)
+os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 
 from secret import secret
 from myPackage import NotionUpdate_API as N_Update

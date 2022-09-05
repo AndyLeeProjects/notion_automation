@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pprint import pprint 
-import Google 
+from Google_API import Google 
 import numpy as np
 import pandas as pd
 from datetime import datetime
