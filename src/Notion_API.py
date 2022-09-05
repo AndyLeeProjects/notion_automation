@@ -12,7 +12,6 @@ import pandas as pd
 import json
 import time
 
-
 """ ConnectNotionDB 
 
 __init__: 
@@ -35,7 +34,7 @@ get_projects_titles:
 
 clean_data & extract_nested_elements: 
             Organizes JSON data into a cleaner dictionary. 
-            However, each varialbe has varying number of nested objects. 
+            However, each variable has varying number of nested objects. 
             In other words, we need different line of code to access different types of elements.
             So extract_nested_elements function generates different codes to help complete the 
             cleaning process. 
@@ -50,25 +49,33 @@ retrieve_data:
 
 
 class ConnectNotionDB:
-    def __init__(self, database_id, token_key):
-        """Initial Setup
+    def __init__(self, database_id, token_key, filters:dict = None):
+        """
+        Initial Setup
 
         Args:
             database_id (str): database id can be found in the database url
-            token_key (str): toekn key can be found in Notion page (Under Inspect).
+            token_key (str): token key can be found in Notion page (Under Inspect).
         """
         self.database_id = database_id
         self.token_key = token_key
         self.headers = headers = {
-            "Authorization": "Bearer " + self.token_key,
+            "Accept": "application/json",
+            "Notion-Version": "2021-05-13",
             "Content-Type": "application/json",
-            "Notion-Version": "2021-05-13"
+            "Authorization": "Bearer " + self.token_key
         }
+
+        if filters != None:
+            self.filters = filters
+        else:
+            self.filters = None
 
 
 
     def query_databases(self):
-        """Requests Notion for an access to the designated database.
+        """
+        Requests Notion for an access to the designated database.
 
         Raises:
             ValueError: ValueError raised with incorrect input.
@@ -77,7 +84,7 @@ class ConnectNotionDB:
             JSON data 
         """
         database_url = 'https://api.notion.com/v1/databases/' + self.database_id + "/query"
-        response = requests.post(database_url, headers=self.headers)
+        response = requests.post(database_url, json=self.filters, headers=self.headers)
         if response.status_code != 200:
             raise ValueError(f'Response Status: {response.status_code}')
         else:
@@ -87,7 +94,8 @@ class ConnectNotionDB:
 
             
     def get_all_pages(self):
-        """Scrolls through all pages in the database.
+        """
+        Scrolls through all pages in the database.
             - Only applies when there are more than 100 elements in the database.
 
         Returns:
@@ -106,23 +114,23 @@ class ConnectNotionDB:
                 self.json['start_cursor'] = next_cur
                 data_hidden = json.dumps(self.json)
 
-                # Gets the next 100 results
-                payload = {"page_size": 100}
                 data_hidden = requests.post(
-                    readUrl, json = payload, headers=self.headers, data=data_hidden).json()
-
+                    readUrl, json=self.filters, headers=self.headers, data=data_hidden).json()
                 self.json["results"] += data_hidden["results"]
                 next_cur = data_hidden['next_cursor']
                 page_num += 1
                 if next_cur is None:
+                    print(len(self.json['results']))
                     break
         except:
             pass
+        
         return self.json
     
     
     def get_projects_titles(self):
-        """Collects the titles from the row with maximum number of title names
+        """
+        Collects the titles from the row with maximum number of title names
             - when there is empty input(s) in Notion DB, the title name does not appear 
             in the retrieved JSON data. Therefore, by finding the maximum number of 
             "non-empty" row provides the maximum number of titles names. 
@@ -143,7 +151,8 @@ class ConnectNotionDB:
         
         
     def clean_data(self):
-        """Cleans JSON data using title_type
+        """
+        Cleans JSON data using title_type
             - Types include created_time, number, checkbox, last_edited_time, multi_select
             select, rich_text, select, title, etc.
 
@@ -155,6 +164,8 @@ class ConnectNotionDB:
             
             # Get the type of the variable and use it as a filtering tool
             title_type = self.json['results'][self.max_ind]['properties'][title]['type']
+            #if title == "Social":
+                #print(self.json['results'][self.max_ind]['properties'][title][title_type].encode('utf-8'))
             temp = []
             page_id = []
             for i in range(len(self.json['results'])):
@@ -179,7 +190,8 @@ class ConnectNotionDB:
         return self.data
 
     def extract_nested_elements(data, key, ind):
-        """Even after cleaning the data, JSON type elements will still exist. 
+        """
+        Even after cleaning the data, JSON type elements will still exist. 
            Thus, this function provides nested_type, which will allow complete access to all elements.
 
         Args:
@@ -232,11 +244,34 @@ class ConnectNotionDB:
             return nested_type
         except:
             pass
-        
 
+
+    def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+        """
+        Call in a loop to create terminal progress bar
+
+        Args:
+            iteration   - Required (int)  : current iteration (Int)
+            total       - Required (int)  : total iterations (Int)
+            prefix      - Optional (str)  : prefix string (Str)
+            suffix      - Optional (str)  : suffix string (Str)
+            decimals    - Optional (int)  : positive number of decimals in percent complete (Int)
+            length      - Optional (int)  : character length of bar (Int)
+            fill        - Optional (str)  : bar fill character (Str)
+            printEnd    - Optional (str)  : end character (e.g. "\r", "\r\n") (Str)
+        """
+        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+        filledLength = int(length * iteration // total)
+        bar = fill * filledLength + '-' * (length - filledLength)
+        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+        # Print New Line on Complete
+        if iteration == total: 
+            print()
+        
     
     def retrieve_data(self):
-        """Retrieves data from the designated database in Notion by running all methods above.
+        """
+        Retrieves data from the designated database in Notion by running all methods above.
 
         Returns:
             pandas dataframe: Default return option
@@ -244,4 +279,6 @@ class ConnectNotionDB:
         jsn = self.query_databases()
         jsn_all = self.get_all_pages()
         titles = self.get_projects_titles()
-        return  pd.DataFrame(self.clean_data())
+        df = pd.DataFrame(self.clean_data())
+        df['Index'] = range(0, len(df))
+        return df

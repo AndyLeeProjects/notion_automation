@@ -6,6 +6,7 @@ Created on Mon Mar 29 13:31:41 2021
 """
     
 from logging import raiseExceptions
+from tkinter import E
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -127,7 +128,7 @@ def highlight_datetimes(indices, ax, mon):
         i += 1
 
 
-def monthly_eval(mon, update_window):
+def monthly_eval(mon, update_window: bool):
     
     # count all data for the graph
     all_dat = month_read.all_data('include date')[0]
@@ -203,7 +204,11 @@ def monthly_eval(mon, update_window):
             raise ValueError
     except:
         for d in mon['Date']:
-            if '-' in d:
+            # Format date 
+            if len(str(d))> 15:
+                d = str(d.strftime('%Y-%m-%d'))
+
+            if '-' in str(d):
                 d = d.split('-')
                 date.append(d[2][:2])
             else:
@@ -389,4 +394,17 @@ def monthly_eval(mon, update_window):
     fig.suptitle('Evaluation: '+datetime.today().strftime('%m/%d') + ' [' + week[datetime.today().weekday()] + ']', fontsize = 16, fontweight = 'bold')
     plt.savefig("C:\\NotionUpdate\progress\jpg files\Monthly Evaluation\month.jpg", format = 'jpg'
             , dpi=1000, bbox_inches = 'tight')
+    # Save it to D drive
+    cur_month = str(datetime.now().strftime("%B"))
+    cur_year = str(datetime.now().strftime('%Y'))
+    try:
+        if update_window == False:
+            plt.savefig(f"D:\\Personal\\progress\\jpg files\\Monthly Evaluation\\{cur_month + cur_year}.jpg", format = 'jpg'
+                , dpi=1000, bbox_inches = 'tight')
+            plt.savefig(f"D:\\AndyLeeProjects.github.io\\monthly_eval_images\\{cur_month + cur_year}.jpg", format = 'jpg'
+                , dpi=1000, bbox_inches = 'tight')
+                
+    except:
+        pass
+    
 
