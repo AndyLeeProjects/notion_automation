@@ -169,12 +169,6 @@ class Connect_Notion:
 
                 # Case where the task in Google Calendar is ALREADY IN the Notion Task DB
                 ## Modify the total duration EST
-                print(self.today_tasks_Google['summary'].iloc[task])
-                print(self.today_tasks_Google['attendees'].iloc[task])
-                print(self.today_tasks_Google['status'].iloc[task])
-                print(self.today_tasks_Google['kind'].iloc[task])
-                print()
-
                 if task_name_Google in list(self.task_data['Name']):
                     
                     if str(meeting_url) != str(np.nan):
@@ -193,6 +187,7 @@ class Connect_Notion:
                                        "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     print("<", task_name_Google,", ", task_duration, ">  Updated")
+                    print()
                 # Case where the task in Google Calendar is NOT IN the Notion Task DB
                 ## Create a new task in Notion Task DB
                 ### status shows my confirm status on the schedule
@@ -200,6 +195,7 @@ class Connect_Notion:
                     create_TodayTask(task_name_Google, task_duration, self.task_databaseId, start_time,
                                     meeting_url, timesort,  self.headers)
                     print("<", task_name_Google,", ", task_duration, ">  Created")
+                    print()
 
     # Update Schedule
     def update_Schedule(self):
@@ -311,13 +307,14 @@ class Connect_Notion:
         self.update_schedule_calendar()
 
         ##### Update Duration DB #####
-        #import notion_duration_db 
+        import notion_duration_db 
 
-        # Download the evaluation data
-        #self.download_evaluation_csv()
+        if self.is_time_between(time_time(21,1),time_time(2,00)) == True:
+            # Download the evaluation data
+            self.download_evaluation_csv()
 
-        # Upload Evaluation Visualization 
-        #self.update_evaluationJPG()
+            # Upload Evaluation Visualization 
+            self.update_evaluationJPG()
 
 
 # Schedule my tasks 
