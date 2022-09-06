@@ -19,7 +19,7 @@ import mysql.connector as MC
 
 class NotionSync:
     def __init__(self, database_id, token_key):
-        import Connect_Notion as Notion
+        import connect_notion as Notion
         self.database_id = database_id
         self.token_key = token_key    
         
@@ -76,7 +76,7 @@ class NotionSync:
         except:
             pass
 
-        # Total checked in routine dataframe
+        # Total checked in routine data frame
         routine_total_checked = routine['total_checked'][len(routine['total_checked'])-1]
         
         # Compare "total_checked" and "routine_total_checked" to update the newest values
@@ -92,7 +92,7 @@ class NotionSync:
                 routine = routine.drop([routine.index[-1]])
             # Add the created row to existing csv file
             routine = pd.concat([routine, new_row], ignore_index = True, axis = 0)
-            # Remove existing directory and Replace it with created dataframe
+            # Remove existing directory and Replace it with created data frame
             os.remove(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv')
             # Save a csv file to replace the old one
             routine.to_csv(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv', encoding='utf-8')

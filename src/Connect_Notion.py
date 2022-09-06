@@ -34,7 +34,7 @@ clean_data & extract_nested_elements:
 
 
 retrieve_data:
-            Runs all methods in the script in order and returns a clean dataframe. 
+            Runs all methods in the script in order and returns a clean data frame. 
 
 
 """
@@ -237,13 +237,13 @@ class ConnectNotionDB:
         except:
             pass
     
-    def retrieve_data(self, type:str = "dataframe"):
+    def retrieve_data(self, type:str = "data frame"):
         """
         retrieve_data(): Retrieves data from the designated database in Notion by running all methods above.
 
         Args:
             type (str): define in which format data is outputted 
-            - "dataframe"
+            - "data frame"
             - "json"
 
         Returns:
@@ -253,7 +253,7 @@ class ConnectNotionDB:
         
 
         Returns:
-            pandas dataframe: Default return option
+            pandas data frame: Default return option
         """
         
         jsn = self.query_databases()
@@ -261,7 +261,7 @@ class ConnectNotionDB:
         if type == "json":
             return jsn_all
         titles = self.get_projects_titles()
-        if type == "dataframe":
+        if type == "data frame":
             df = pd.DataFrame(self.clean_data())
             df["Index"] = range(0, len(df))
             return df

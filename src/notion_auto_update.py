@@ -17,9 +17,9 @@ from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
-from Connect_Notion import ConnectNotionDB as Connect_NotionAPI
-from Update_Notion import * # Update_Notion & create_Task
-from Google_API.Calendar_Automation import GoogleCalendarAPI as CalendarAPI
+from connect_notion import ConnectNotionDB as Connect_NotionAPI
+from update_notion import * # Update_Notion & create_Task
+from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
 
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
@@ -172,14 +172,14 @@ class Connect_Notion:
                     print()
                     if str(meeting_url) != str(np.nan):
                         # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & URL
-                        update_Notion({"Duration_EST": {"select":{"name":task_duration}}, 
+                        update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                     "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
                                     "web 1": {"url": meeting_url}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     else:
                         # Change the Duration_EST (to task_duration) & Starting Time (to start_time)
-                        update_Notion({"Duration_EST": {"select":{"name":task_duration}}, 
+                        update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                     "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
@@ -228,7 +228,7 @@ class Connect_Notion:
 
             if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
                 if self.task_data["Status"].iloc[block] != "Today":
-                    update_Notion({"Status":{"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
+                    update_notion({"Status":{"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
 
             # Check CASE 2
@@ -242,13 +242,13 @@ class Connect_Notion:
                 ## Code to get the Category Name --> self.task_data["Name"].iloc[block].split(':')[0]
                 elif self.task_data["Status"].iloc[block] == "Today" and today_date != self.task_data["Due Date"].iloc[block] and \
                     today not in block_dates:
-                    update_Notion({"Status":{"select": {"name": self.task_data["Name"].iloc[block].split(':')[0]}}} , self.task_data["pageId"].iloc[block], self.headers)
+                    update_notion({"Status":{"select": {"name": self.task_data["Name"].iloc[block].split(':')[0]}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
             # Check CASE 3
             if today_date == self.task_data["Due Date"].iloc[block]:
                 if self.task_data["Status"].iloc[block] != "Today":
-                    update_Notion({"Status": {"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
+                    update_notion({"Status": {"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
             
         
@@ -303,7 +303,7 @@ class Connect_Notion:
         self.update_schedule_calendar()
 
         ##### Update Duration DB #####
-        import Notion_Duration_DB 
+        import notion_duration_db 
 
         # Download the evaluation data
         self.download_evaluation_csv()

@@ -23,7 +23,7 @@ from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
 from datetime import time as time_time
 from datetime import timedelta
-import Connect_Notion as N_API
+import connect_notion as N_API
 
 
 class Connect_Notion:

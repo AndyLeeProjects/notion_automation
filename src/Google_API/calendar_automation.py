@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pprint import pprint 
-from Google_API import Google 
+from Google_API import google 
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -49,7 +49,7 @@ class GoogleCalendarAPI:
         get_CalendarData(): Using the API setup & the assigned filters, retrieve data using Google Calendar API
         """
         # Pass in necessary parameters
-        service = Google.Create_Service(self.CLIENT_SECRET_FILE, self.API_NAME, self.API_VERSION, self.SCOPES)
+        service = google.Create_Service(self.CLIENT_SECRET_FILE, self.API_NAME, self.API_VERSION, self.SCOPES)
         page_token = None
 
         self.calendar_jsonData = []

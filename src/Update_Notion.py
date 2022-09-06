@@ -2,7 +2,7 @@
 import requests, json
 import numpy as np
 
-def update_Notion(content, pageId: str, headers):
+def update_notion(content, pageId: str, headers):
     """_summary_
 
     Args:
