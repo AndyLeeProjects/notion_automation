@@ -312,7 +312,7 @@ class Connect_Notion:
         self.download_evaluation_csv()
 
         # Upload Evaluation Visualization 
-        #self.update_evaluationJPG()
+        self.update_evaluationJPG()
 
 
 # Schedule my tasks 
