@@ -66,10 +66,10 @@ class Connect_Notion:
         response = requests.request("PATCH", updateUrl_to_waitlist, 
                                     headers=self.headers, data=json.dumps(updateDuration_EST)) 
 
-    def updateDuration_Tasks(self, pageId, tasks):
+    def update_duration_tasks(self, pageId, tasks):
         updateUrl_to_waitlist = f"https://api.notion.com/v1/pages/{pageId}"
     
-        updateDuration_Tasks = {
+        update_duration_tasks = {
             "properties": {
                 "D_Tasks": {
                     "number": tasks
@@ -79,10 +79,10 @@ class Connect_Notion:
         
         
         response = requests.request("PATCH", updateUrl_to_waitlist, 
-                                    headers=self.headers, data=json.dumps(updateDuration_Tasks)) 
+                                    headers=self.headers, data=json.dumps(update_duration_tasks)) 
 
     
-    def get_DurationTime_EST(self):
+    def get_duration_time_est(self):
         print('****************** Updating Duration Database ******************')
         # Get 3 values
             # 1. Total Task Duration EST   AND   Total num of Tasks
@@ -156,29 +156,29 @@ class Connect_Notion:
                         'rem_durationEST':rem_durationEST,
                         'rem_numTasks':len(rem_numTasks)}
     
-    def update_DurationDB(self):
+    def update_duration_db(self):
         print("Uploading to Duration DB...")
         # Update Total, Finished, Remaining Durations & Tasks for Today
         for row in range(3):
             if self.dur_data['D_Title'][row] == "Total Work Hours EST":
                 CNotion.updateDuration_EST(self.dur_data['pageId'][row],  
                                            self.duration_dic['tot_durationEST'])
-                CNotion.updateDuration_Tasks(self.dur_data['pageId'][row], 
+                CNotion.update_duration_tasks(self.dur_data['pageId'][row], 
                                            self.duration_dic['tot_numTasks'])     
                 
             elif self.dur_data['D_Title'][row] == "Total Work Hours Finished":
                 CNotion.updateDuration_EST(self.dur_data['pageId'][row], 
                                            self.duration_dic['fin_durationEST'])        
-                CNotion.updateDuration_Tasks(self.dur_data['pageId'][row], 
+                CNotion.update_duration_tasks(self.dur_data['pageId'][row], 
                                            self.duration_dic['fin_numTasks'])        
             else:
                 CNotion.updateDuration_EST(self.dur_data['pageId'][row], 
                                            self.duration_dic['rem_durationEST'])        
-                CNotion.updateDuration_Tasks(self.dur_data['pageId'][row], 
+                CNotion.update_duration_tasks(self.dur_data['pageId'][row], 
                                            self.duration_dic['rem_numTasks'])       
         print('Update Completed\n\n\n\n')
                 
-    def update_durationCSV(self):
+    def update_duration_csv(self):
         # ADD Duration variables(For further statistical analysis)
         new_row = pd.DataFrame(self.duration_dic, index = [0])
         today = datetime.today()
@@ -231,13 +231,13 @@ class Connect_Notion:
     
     def execute_all(self):
         # Update Total Duration Estimate Database
-        self.get_DurationTime_EST()
+        self.get_duration_time_est()
 
         # Update Duration Database
-        self.update_DurationDB()
+        self.update_duration_db()
 
         # Update duration_est.csvs
-        self.update_durationCSV()
+        self.update_duration_csv()
 
     
 

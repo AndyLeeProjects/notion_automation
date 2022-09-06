@@ -19,7 +19,7 @@ from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
 from Connect_Notion import ConnectNotionDB as Connect_NotionAPI
 from Update_Notion import * # Update_Notion & create_Task
-from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
+from Google_API.Calendar_Automation import GoogleCalendarAPI as CalendarAPI
 
 # Modify the data for git representation(Privacy reasons)
 from myPackage import remove_names_git
@@ -52,7 +52,7 @@ class Connect_Notion:
         }
     
     # Overwrite the existing excel file with an updated data for duration_EST data & self-evaluation data
-    def download_evaluationCSV(self):
+    def download_evaluation_csv(self):
 
         # String Manipulation to create file names
         date = self.eval_data['Date'][0].split('-')
@@ -96,7 +96,7 @@ class Connect_Notion:
         else:
             return dt_string
         
-    def update_ScheduleCalendar(self):
+    def update_schedule_calendar(self):
         # Connect to Google Calendar API 
         CLIENT_SECRET_FILE = secret.GoogleCalendar_connect('credentials')
         calendarId = secret.GoogleCalendar_connect('calendarId')
@@ -300,13 +300,13 @@ class Connect_Notion:
         self.update_Schedule()
 
         # Updates & Creates Tasks from Google Calendar API
-        self.update_ScheduleCalendar()
+        self.update_schedule_calendar()
 
         ##### Update Duration DB #####
-        import notion_durationDB 
+        import Notion_Duration_DB 
 
         # Download the evaluation data
-        self.download_evaluationCSV()
+        self.download_evaluation_csv()
 
         # Upload Evaluation Visualization 
         #self.update_evaluationJPG()

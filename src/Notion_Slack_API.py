@@ -13,7 +13,7 @@ from secret import secret
 import Connect_Notion as Notion
 
 # ************* DO NOT DELETE *************
-import notion_durationDB
+import Notion_Duration_DB
 from myPackage import notion_routine_API # saves morning routine
 # *****************************************
 
