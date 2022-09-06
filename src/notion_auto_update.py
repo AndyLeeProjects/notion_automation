@@ -145,6 +145,7 @@ class Connect_Notion:
 
             # Redefine below variables for the simplicity
             task_duration = task_duration_Google[task_name_Google]
+            timesort = start_time[0] + start_time[1] # timesort is used to sort the database in order in Notion
             if int(start_time[0]) // 12 == 0:
                 start_time = start_time[0] + ":" + start_time[1] + " am"
             else:
@@ -171,17 +172,19 @@ class Connect_Notion:
                     print("<", task_name_Google,", ", task_duration, ">  Updated")
                     print()
                     if str(meeting_url) != str(np.nan):
-                        # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & URL
+                        # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & timesort & URL
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                     "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
+                                    "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]},
                                     "web 1": {"url": meeting_url}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     else:
-                        # Change the Duration_EST (to task_duration) & Starting Time (to start_time)
+                        # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & timesort
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
-                                    "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
-                                                           {"type": "text", "text": {"content": start_time}}]}}, 
+                                       "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
+                                                           {"type": "text", "text": {"content": start_time}}]},
+                                       "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
 
                 # Case where the task in Google Calendar is NOT IN the Notion Task DB
@@ -190,7 +193,7 @@ class Connect_Notion:
                 elif self.today_tasks_Google['status'].iloc[task] == 'confirmed':
                     print("<", task_name_Google,", ", task_duration, ">  Created")
                     create_TodayTask(task_name_Google, task_duration, self.task_databaseId, start_time,
-                                    meeting_url, self.headers)
+                                    meeting_url, timesort,  self.headers)
 
 
     # Update Schedule

@@ -27,7 +27,7 @@ def update_notion(content, pageId: str, headers):
 
     
 def create_TodayTask(task_name:str, task_duration, task_databaseId:str, 
-                    start_time:str, meeting_link:str, headers:dict):
+                    start_time:str, meeting_link:str, timesort:str, headers:dict):
     path = "https://api.notion.com/v1/pages"
 
     # Case 1: Includes the link
@@ -47,7 +47,8 @@ def create_TodayTask(task_name:str, task_duration, task_databaseId:str,
             "Duration_EST": {"select": {"name": task_duration}},
             "Status": {"select": {"name": "Today"}},
             "web 1": {"url": meeting_link},
-            "Time": {"rich_text": [{"type": "text", "text": {"content": start_time}}]}
+            "Time": {"rich_text": [{"type": "text", "text": {"content": start_time}}]},
+            "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]}
         }
     }
 
