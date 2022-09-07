@@ -146,7 +146,7 @@ class Connect_Notion:
             # Redefine below variables for the simplicity
             task_duration = task_duration_Google[task_name_Google]
             task_status = self.today_tasks_Google['attendees'].iloc[task]
-            timesort = start_time[0] + start_time[1] # timesort is used to sort the database in order in Notion
+            timesort = int(start_time[0] + start_time[1]) # timesort is used to sort the database in order in Notion
             if int(start_time[0]) // 12 == 0:
                 start_time = start_time[0] + ":" + start_time[1] + " am"
             else:
@@ -176,7 +176,7 @@ class Connect_Notion:
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                     "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
-                                    "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]},
+                                    "timesort": {"number": timesort},
                                     "web 1": {"url": meeting_url}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     else:
@@ -184,7 +184,7 @@ class Connect_Notion:
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                        "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
-                                       "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]}}, 
+                                       "timesort": {"number": timesort}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     print("<", task_name_Google,", ", task_duration, ">  Updated")
                     print()
