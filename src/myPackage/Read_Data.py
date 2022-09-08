@@ -9,10 +9,6 @@ import numpy as np
 import pandas as pd
 import sys, os
 # Change the path name depending on the operating system
-if os.set_handle_inheritable == 'posix':
-    sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
-else:
-    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation\\myPackage')
 
 
 '''
