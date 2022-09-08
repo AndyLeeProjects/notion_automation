@@ -161,7 +161,6 @@ class Connect_Notion:
                 task_duration = f'{task_duration % 60}min'
             else:
                 task_duration = f'{task_duration // 60}hr {task_duration % 60}min'
-
             # If the task name exists in the Notion Task DB, then Update
             ## Else, create a new task
             ## --> If the time is between 12:00am and 4:00am, no updates needed
