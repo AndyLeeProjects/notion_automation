@@ -18,7 +18,7 @@ from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
 from connect_notion import ConnectNotionDB as Connect_NotionAPI
-from update_notion import * # Update_Notion & create_Task
+from update_notion import * # Update_Notion & create_today_task
 from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
 
 # Modify the data for git representation(Privacy reasons)
@@ -191,7 +191,7 @@ class Connect_Notion:
                 ## Create a new task in Notion Task DB
                 ### status shows my confirm status on the schedule
                 elif task_status == "accepted" or str(task_status) == str(np.nan):
-                    create_TodayTask(task_name_Google, task_duration, self.task_databaseId, start_time,
+                    create_today_task(task_name_Google, task_duration, self.task_databaseId, start_time,
                                     meeting_url, timesort,  self.headers)
                     print("<", task_name_Google,", ", task_duration, ">  Created")
                     print()

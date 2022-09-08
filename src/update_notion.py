@@ -26,7 +26,7 @@ def update_notion(content, pageId: str, headers):
 
 
     
-def create_TodayTask(task_name:str, task_duration, task_databaseId:str, 
+def create_today_task(task_name:str, task_duration, task_databaseId:str, 
                     start_time:str, meeting_link:str, timesort:str, headers:dict):
     path = "https://api.notion.com/v1/pages"
 
@@ -80,5 +80,3 @@ def create_TodayTask(task_name:str, task_duration, task_databaseId:str,
         newPageData = newPageData_with_link
 
     response = requests.post(path, json=newPageData, headers=headers)
-    print(response)
-    print()
