@@ -9,9 +9,9 @@ import pandas as pd
 from datetime import time as time_time
 
 # Direct to specified path to use the modules below
-os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__))))
 #sys.path.append(r"c:\NotionUpdate\progress\notion_automation")
-
+print(os.getcwd())
 from secret import secret
 from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb

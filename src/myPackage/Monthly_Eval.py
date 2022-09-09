@@ -5,18 +5,13 @@ Created on Mon Mar 29 13:31:41 2021
 @author: anddy
 """
     
-from logging import raiseExceptions
 from tkinter import E
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 import os, sys
-if os.name == 'posix':
-    sys.path.append('/Volumes/Programming/Personal/progress/myPackage')
-else:
-    sys.path.append('C:\\NotionUpdate\\progress\\notion_automation\\myPackage')
-import Read_Data as pRd
-import std_risetime as srt
+from myPackage import Read_Data as pRd
+from myPackage import std_risetime as srt
 import time
 from datetime import datetime
 month_read = pRd.read_data()
