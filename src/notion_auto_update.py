@@ -308,7 +308,8 @@ class Connect_Notion:
         ##### Update Duration DB #####
         import notion_duration_db 
 
-        if self.is_time_between(time_time(21,1),time_time(2,00)) == True:
+        if self.is_time_between(time_time(21,1),time_time(2,00)) == True or \
+           self.is_time_between(time_time(7,00),time_time(11,00)) == True:
             # Download the evaluation data
             self.download_evaluation_csv()
 
