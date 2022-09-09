@@ -176,14 +176,16 @@ class Connect_Notion:
                                     "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
                                     "timesort": {"number": timesort},
-                                    "web 1": {"url": meeting_url}}, 
+                                    "web 1": {"url": meeting_url},
+                                    "Status": {"select":{"name":"Today"}}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     else:
                         # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & timesort
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                        "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
-                                       "timesort": {"number": timesort}}, 
+                                       "timesort": {"number": timesort},
+                                       "Status": {"select":{"name":"Today"}}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     print("<", task_name_Google,", ", task_duration, ">  Updated")
                     print()
