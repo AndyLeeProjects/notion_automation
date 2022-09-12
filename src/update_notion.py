@@ -23,7 +23,8 @@ def update_notion(content, pageId: str, headers):
 
     response = requests.request("PATCH", update_url,
                                 headers=headers, data=json.dumps(update_properties))
-
+    print(response, "\n")
+    
 
     
 def create_today_task(task_name:str, task_duration, task_databaseId:str, 
@@ -31,30 +32,7 @@ def create_today_task(task_name:str, task_duration, task_databaseId:str,
     path = "https://api.notion.com/v1/pages"
 
     # Case 1: Includes the link
-    newPageData_with_link = {
-        "parent": {"database_id": task_databaseId},
-        "properties": {
-            "Name": {
-                "title":[
-                    {
-                        "type": "text",
-                        "text":{
-                            "content": task_name
-                        }
-                    }
-                ]
-            },
-            "Duration_EST": {"select": {"name": task_duration}},
-            "Status": {"select": {"name": "Today"}},
-            "web 1": {"url": meeting_link},
-            "Time": {"rich_text": [{"type": "text", "text": {"content": start_time}}]},
-            "timesort": {"rich_text": [{"type": "text", "text": {"content": timesort}}]}
-        }
-    }
-
-
-        # Case 1: Includes the link
-    newPageData_without_link = {
+    newPageData = {
         "parent": {"database_id": task_databaseId},
         "properties": {
             "Name": {
@@ -70,13 +48,15 @@ def create_today_task(task_name:str, task_duration, task_databaseId:str,
             "Duration_EST": {"select": {"name": task_duration}},
             "Status": {"select": {"name": "Today"}},
             "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
-                                   {"type": "text", "text": {"content": start_time}}]}
-            }
+                                   {"type": "text", "text": {"content": start_time}}]},
+            "timesort": {"number": timesort}
+        }
     }
 
-    if str(meeting_link) == str(np.nan):
-        newPageData = newPageData_without_link
-    else:
-        newPageData = newPageData_with_link
+    # Add in a link if it's not nan
+    if str(meeting_link) != str(np.nan):
+        newPageData["properties"]["web 1"] = {"url": meeting_link}
 
     response = requests.post(path, json=newPageData, headers=headers)
+    print("<", task_name,", ", task_duration, ">  Created")
+    print(response, "\n")

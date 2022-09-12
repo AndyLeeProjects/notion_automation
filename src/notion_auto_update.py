@@ -9,9 +9,9 @@ import pandas as pd
 from datetime import time as time_time
 
 # Direct to specified path to use the modules below
-os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__))))
 #sys.path.append(r"c:\NotionUpdate\progress\notion_automation")
-
+print(os.getcwd())
 from secret import secret
 from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
@@ -104,7 +104,7 @@ class Connect_Notion:
 
         # Get today's tasks
         self.today_tasks_Google = GoogleCal.execute_all("today_tasks")
-        
+
         # Get all upcoming tasks
         self.upcoming_tasks_Google = GoogleCal.execute_all("upcoming_tasks")
 
@@ -113,7 +113,7 @@ class Connect_Notion:
                         for i in range(len(self.today_tasks_Google))
                         if calendarId ==  self.today_tasks_Google['creator'].iloc[i]]
         my_schedule = self.today_tasks_Google.loc[my_schedule]
-
+        
         # In the case of redundant tasks, accumulate the total duration
         task_duration_Google = {}
 
@@ -129,7 +129,7 @@ class Connect_Notion:
             # Get task name
             task_name_Google = self.today_tasks_Google['summary'].iloc[task]
 
-            # Personal Filter
+            # My Personal Filter
             if "Andy Lee and" in task_name_Google:
                 task_name_Google = task_name_Google.replace(" | Other", "")
                 task_name_Google = task_name_Google.replace("Andy Lee and ", "Pathrise: Meeting with ")
@@ -143,7 +143,7 @@ class Connect_Notion:
             except KeyError:
                 task_duration_Google[task_name_Google] = task_duration
 
-            # Redefine below variables for the simplicity
+            # Redefine variables for the simplicity
             task_duration = task_duration_Google[task_name_Google]
             task_status = self.today_tasks_Google['attendees'].iloc[task]
             timesort = int(start_time[0] + start_time[1]) # timesort is used to sort the database in order in Notion
@@ -169,32 +169,33 @@ class Connect_Notion:
                 # Case where the task in Google Calendar is ALREADY IN the Notion Task DB
                 ## Modify the total duration EST
                 if task_name_Google in list(self.task_data['Name']):
-                    
+                    print("<", task_name_Google,", ", task_duration, ">  Updated")
                     if str(meeting_url) != str(np.nan):
                         # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & timesort & URL
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                     "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
                                     "timesort": {"number": timesort},
-                                    "web 1": {"url": meeting_url}}, 
+                                    "web 1": {"url": meeting_url},
+                                    "Status": {"select":{"name":"Today"}}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
                     else:
                         # Change the Duration_EST (to task_duration) & Starting Time (to start_time) & timesort
                         update_notion({"Duration_EST": {"select":{"name":task_duration}}, 
                                        "Time": {"rich_text": [{"type": "text", "text": {"content": "Time: "}, "annotations":{"bold":True}},
                                                            {"type": "text", "text": {"content": start_time}}]},
-                                       "timesort": {"number": timesort}}, 
+                                       "timesort": {"number": timesort},
+                                       "Status": {"select":{"name":"Today"}}}, 
                                     self.task_data[self.task_data['Name'] == task_name_Google]['pageId'].iloc[0], headers = self.headers)
-                    print("<", task_name_Google,", ", task_duration, ">  Updated")
-                    print()
+
                 # Case where the task in Google Calendar is NOT IN the Notion Task DB
                 ## Create a new task in Notion Task DB
                 ### status shows my confirm status on the schedule
+                    
                 elif task_status == "accepted" or str(task_status) == str(np.nan):
                     create_today_task(task_name_Google, task_duration, self.task_databaseId, start_time,
                                     meeting_url, timesort,  self.headers)
-                    print("<", task_name_Google,", ", task_duration, ">  Created")
-                    print()
+                    
 
     # Update Schedule
     def update_Schedule(self):
