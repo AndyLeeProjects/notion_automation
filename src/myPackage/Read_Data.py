@@ -159,10 +159,3 @@ class read_data():
             print()
         except:
             pass
-
-RD = read_data()
-month_data = RD.monthly(8,22)
-month_data.to_csv(r"/Volumes/Programming/notion_automation/month_Data/0822.csv")
-
-all_dat = RD.all_data("include date")[0]
-all_dat.to_csv(r"/Volumes/Programming/AndyLeeProjects.github.io/Evaluation Data/all_dat.csv")
