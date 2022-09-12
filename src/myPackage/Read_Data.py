@@ -66,6 +66,7 @@ class read_data():
             month_data['Key_words'] = month_data['Key_words'].str.replace(', ', '-')
         except:
             pass
+
         return month_data
 
     def DeleteUnnecessaryVar(data,purpose):
@@ -158,9 +159,3 @@ class read_data():
             print()
         except:
             pass
-    
-
-
-
-
-
