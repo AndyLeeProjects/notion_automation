@@ -29,7 +29,7 @@ class read_data():
         if os.name == 'nt':
             path = r'C:\NotionUpdate\progress\notion_automation\month_Data\%s.csv'
         else:        
-            path = r'/Volumes/Programming/Personal/progress/month_Data/%s.csv'
+            path = r'/Volumes/Programming/notion_automation/month_Data/%s.csv'
         file_name = str.zfill(str(month),2) + str(year)
         month_data = pd.read_csv(path % file_name)
         month_data['Date'] = month_data['Date'].astype('datetime64[ns]')
@@ -159,3 +159,10 @@ class read_data():
             print()
         except:
             pass
+
+RD = read_data()
+month_data = RD.monthly(8,22)
+month_data.to_csv(r"/Volumes/Programming/notion_automation/month_Data/0822.csv")
+
+all_dat = RD.all_data("include date")[0]
+all_dat.to_csv(r"/Volumes/Programming/AndyLeeProjects.github.io/Evaluation Data/all_dat.csv")
