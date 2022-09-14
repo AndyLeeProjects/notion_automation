@@ -145,6 +145,7 @@ class Connect_Notion:
 
             # Redefine variables for the simplicity
             task_duration = task_duration_Google[task_name_Google]
+            recurring_id = self.today_tasks_Google['recurringEventId'].iloc[task]
             task_status = self.today_tasks_Google['attendees'].iloc[task]
             timesort = int(start_time[0] + start_time[1]) # timesort is used to sort the database in order in Notion
             if int(start_time[0]) // 12 == 0:
@@ -191,7 +192,6 @@ class Connect_Notion:
                 # Case where the task in Google Calendar is NOT IN the Notion Task DB
                 ## Create a new task in Notion Task DB
                 ### status shows my confirm status on the schedule
-                    
                 elif task_status == "accepted" or str(task_status) == str(np.nan):
                     create_today_task(task_name_Google, task_duration, self.task_databaseId, start_time,
                                     meeting_url, timesort,  self.headers)
@@ -210,8 +210,13 @@ class Connect_Notion:
             # If it's past 1:00 pm, don't reschedule it again
             ## Fix any changes made to the automated schedule
             if self.is_time_between(time_time(13,00),time_time(2,00)) == True:
-               print('\n\n')
-               return self.task_data['Status'].value_counts()["Today"]
+                print('\n\n')
+                
+                # In case when there is no task in the "Today" column
+                try:
+                    return self.task_data['Status'].value_counts()["Today"]
+                except:
+                    return 0
             
             
             # Check if today(Mon,Tue,...,Sun) matches the block's day
