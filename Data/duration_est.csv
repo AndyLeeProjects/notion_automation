@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-,tot_durationEST,tot_numTasks,fin_durationEST,fin_numTasks,rem_durationEST,rem_numTasks,Date
+index,tot_durationEST,tot_numTasks,fin_durationEST,fin_numTasks,rem_durationEST,rem_numTasks,Date
 0,7hr 0min,5,3hr 0min,2,4hr 0min,3,6/4/2022
 1,5hr 50min,5,5hr 50min,5,0hr 0min,0,6/5/2022
 2,5hr 50min,5,0hr 20min,1,5hr 30min,4,6/6/2022
@@ -202,4 +201,3 @@
 95,7hr 0min,7,5hr 0min,4,2hr 0min,3,09/08/2022
 96,6hr 30min,6,0hr 0min,0,6hr 30min,6,09/09/2022
 97,3hr 0min,3,0hr 0min,0,3hr 0min,3,09/10/2022
->>>>>>> 895573ca0b7aab12488db6266d7c679f013d83d7

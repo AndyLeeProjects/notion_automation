@@ -188,8 +188,7 @@ class Connect_Notion:
             pass
         today_date = today.strftime("%m/%d/%Y")
 
-        duration_df = pd.read_csv(duration_path1,
-                                  sep = ',', index_col = 0)
+        duration_df = pd.read_csv(duration_path1, sep = ',', index_col = 0)
 
         new_row['Date'] = today_date
             
@@ -197,8 +196,7 @@ class Connect_Notion:
         
 
         if new_row['Date'][0] in list(duration_df['Date']):
-            
-            if new_row['fin_numTasks'][0] <= duration_df['fin_numTasks'][0]:
+            if int(new_row['fin_numTasks'][0]) <= int(duration_df['fin_numTasks'][0]):
                 pass
             elif CNotion.is_time_between(time_time(6,00),time_time(11,59)) == True:
                 # Drop the last index & add the new row
