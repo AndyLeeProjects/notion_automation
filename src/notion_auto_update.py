@@ -326,16 +326,3 @@ class Connect_Notion:
 # Schedule my tasks 
 CNotion = Connect_Notion()
 CNotion.execute_all()
-
-
-
-
-
-
-
-
-
-
-        
-        
-        

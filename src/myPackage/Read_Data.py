@@ -29,7 +29,7 @@ class read_data():
         if os.name == 'nt':
             path = r'C:\NotionUpdate\progress\notion_automation\month_Data\%s.csv'
         else:        
-            path = r'/Volumes/Programming/Personal/progress/month_Data/%s.csv'
+            path = r'/Volumes/Programming/notion_automation/month_Data/%s.csv'
         file_name = str.zfill(str(month),2) + str(year)
         month_data = pd.read_csv(path % file_name)
         month_data['Date'] = month_data['Date'].astype('datetime64[ns]')
@@ -66,6 +66,7 @@ class read_data():
             month_data['Key_words'] = month_data['Key_words'].str.replace(', ', '-')
         except:
             pass
+
         return month_data
 
     def DeleteUnnecessaryVar(data,purpose):
@@ -158,9 +159,3 @@ class read_data():
             print()
         except:
             pass
-    
-
-
-
-
-
