@@ -33,12 +33,12 @@ class Connect_Notion:
 
         # Get Task Schedule Data -> task_data
         self.task_databaseId = secret.task_scheduleDB("database_id")
-        TASK = N_API.ConnectNotionDB(self.task_databaseId, self.token_key)
+        TASK = N_API.ConnectNotion(self.task_databaseId, self.token_key)
         self.task_data = TASK.retrieve_data()
 
         # Get Duration Data -> dur_data
         self.duration_databaseId = secret.durationDB('database_id')
-        DUR = N_API.ConnectNotionDB(self.duration_databaseId, self.token_key)
+        DUR = N_API.ConnectNotion(self.duration_databaseId, self.token_key)
         self.dur_data = DUR.retrieve_data()    
         self.headers = {
             "Authorization": "Bearer " + self.token_key,
