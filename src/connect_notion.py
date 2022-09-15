@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import json
 
-""" ConnectNotionDB 
+""" ConnectNotion 
 
 __init__: 
             Basic setup using database_id & token_key
@@ -34,14 +34,13 @@ clean_data & extract_nested_elements:
 
 
 retrieve_data:
-            Runs all methods in the script in order and returns a clean data frame. 
+            Runs all methods in the script in order and returns a clean dataframe. 
 
 
 """
 
 
-
-class ConnectNotionDB:
+class ConnectNotion:
     def __init__(self, database_id:str, token_key:str, filters:dict = None):
         """
         Initial Setup
@@ -61,7 +60,7 @@ class ConnectNotionDB:
         }
 
         if filters != None:
-            self.filters = filters
+            self.filters = {"filter": filters}
         else:
             self.filters = None
 
@@ -175,8 +174,8 @@ class ConnectNotionDB:
         
         for key in self.data.keys():
             row_num = len(self.data[key])
-            
-            self.data[key] = [ConnectNotionDB.extract_nested_elements(self.data, key, ind) 
+
+            self.data[key] = [ConnectNotion.extract_nested_elements(self.data, key, ind) 
                          for ind in range(row_num)]
             
         return self.data
@@ -206,7 +205,17 @@ class ConnectNotionDB:
             return nested_type
         except:
             pass
-
+        
+        try:
+            nested_type = data[key][ind][0]["name"]
+            # In the case for type external url
+            if data[key][ind][0]['type'] == 'external' and 'http' in data[key][ind][0]['external']['url']:
+                return data[key][ind][0]['external']['url']
+            else:
+                return nested_type
+        except:
+            pass
+        
         try:
             nested_type = data[key][ind][0]["text"]["content"]
             return nested_type
@@ -215,12 +224,6 @@ class ConnectNotionDB:
         
         try:
             nested_type = data[key][ind]["number"]
-            return nested_type
-        except:
-            pass
-        
-        try:
-            nested_type = data[key][ind][0]["name"]
             return nested_type
         except:
             pass
@@ -237,31 +240,25 @@ class ConnectNotionDB:
         except:
             pass
     
-    def retrieve_data(self, type:str = "data frame"):
+    def retrieve_data(self, return_type:str = "dataframe"):
         """
         retrieve_data(): Retrieves data from the designated database in Notion by running all methods above.
 
         Args:
-            type (str): define in which format data is outputted 
-            - "data frame"
+            return_type (str): define in which format data is outputted 
+            - "dataframe"
             - "json"
 
         Returns:
             data in specified type(format) 
         """
-        """
-        
-
-        Returns:
-            pandas data frame: Default return option
-        """
         
         jsn = self.query_databases()
         jsn_all = self.get_all_pages()
-        if type == "json":
+        if return_type == "json":
             return jsn_all
         titles = self.get_projects_titles()
-        if type == "data frame":
+        if return_type == "dataframe":
             df = pd.DataFrame(self.clean_data())
             df["Index"] = range(0, len(df))
             return df

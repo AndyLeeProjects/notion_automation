@@ -17,7 +17,7 @@ from myPackage import NotionUpdate_API as N_Update
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD
-from connect_notion import ConnectNotionDB as Connect_NotionAPI
+from connect_notion import ConnectNotion
 from update_notion import * # Update_Notion & create_today_task
 from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
 
@@ -25,24 +25,28 @@ from Google_API.calendar_automation import GoogleCalendarAPI as CalendarAPI
 from myPackage import remove_names_git
 
 
-class Connect_Notion:
+class NotionAutomation:
     def __init__(self):
         # Get Token Key
         self.token_key = secret.notion_API("token_key")
 
         # Get Task Schedule Data -> task_data
         self.task_databaseId = secret.task_scheduleDB("database_id")
-        TASK = Connect_NotionAPI(self.task_databaseId, self.token_key)
+        TASK = ConnectNotion(self.task_databaseId, self.token_key)
         self.task_data = TASK.retrieve_data()
+        ## task_data error with missing column of "Due Date"
+        ### Temporary Fix
+        if "Due Date" not in self.task_data.keys():
+            self.task_data["Due Date"] = [np.nan]*len(self.task_data["Date"])
 
         # Get Evaluation Data -> eval_data
         self.eval_databaseId = secret.evaluation_db("database_id")
-        EVAL = Connect_NotionAPI(self.eval_databaseId, self.token_key)
+        EVAL = ConnectNotion(self.eval_databaseId, self.token_key)
         self.eval_data = EVAL.retrieve_data()
 
         # Get Duration Data -> dur_data
         self.duration_databaseId = secret.durationDB('database_id')
-        DUR = Connect_NotionAPI(self.duration_databaseId, self.token_key)
+        DUR = ConnectNotion(self.duration_databaseId, self.token_key)
         self.dur_data = DUR.retrieve_data()    
 
         self.headers = {
@@ -324,5 +328,5 @@ class Connect_Notion:
 
 
 # Schedule my tasks 
-CNotion = Connect_Notion()
+CNotion = NotionAutomation()
 CNotion.execute_all()
