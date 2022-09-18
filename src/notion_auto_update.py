@@ -218,8 +218,8 @@ class NotionAutomation:
                 
                 # In case when there is no task in the "Today" column
                 try:
-                    return self.task_data['Status'].value_counts()["Today"]
-                except:
+                    return self.task_data['Status'].value_counts()['Today']
+                except KeyError:
                     return 0
             
             
@@ -268,7 +268,10 @@ class NotionAutomation:
         print("\nUpdate Completed\n\n\n\n")
         
         # Return the total number of today's todo lists
-        return self.task_data['Status'].value_counts()['Today']
+        try:
+            return self.task_data['Status'].value_counts()['Today']
+        except KeyError:
+            return 0
     
                 
     
