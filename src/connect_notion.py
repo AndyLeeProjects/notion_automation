@@ -198,7 +198,7 @@ class ConnectNotion:
         try:
             if isinstance(data[key][ind], dict) == True:
                 nested_type = data[key][ind]["name"]
-            elif len(data[key][ind]) != 1:
+            elif isinstance(data[key][ind], list) == True:
                 nested_type = [data[key][ind][i]["name"] for i in range(len(data[key][ind]))]
             else:
                 nested_type = data[key][ind]["name"]

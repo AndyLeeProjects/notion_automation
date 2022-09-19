@@ -4,7 +4,6 @@ import requests
 import sys
 import numpy as np
 import time
-from slacker import Slacker
 from datetime import datetime
 
 sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')

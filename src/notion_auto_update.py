@@ -230,8 +230,7 @@ class NotionAutomation:
                     # CASE 1: the block is NOT in Today column when it should be (Days)
                     # CASE 2: the block is in Today column wht it should NOT be  (Days)
                     # CASE 3: the block is NOT in Today column when it should be (Date)
-                    
-            
+
             # Check CASE 1
             # In the case block_dates is np.nan, change the type to str (from float)
             ## block_dates example: ['Wed', 'Thur', 'Sat', 'Sun']
@@ -241,7 +240,11 @@ class NotionAutomation:
             if isinstance(block_dates, float):
                 block_dates = str(block_dates)
 
+            print(self.task_data["Name"].iloc[block])
+            print(block_dates)
+            print()
             if today in block_dates or weekday in block_dates or "Everyday" in block_dates:
+                
                 if self.task_data["Status"].iloc[block] != "Today":
                     update_notion({"Status":{"select": {"name": "Today"}}} , self.task_data["pageId"].iloc[block], self.headers)
                     print("[%s] Block Updated" % self.task_data["Name"].iloc[block])
@@ -318,7 +321,7 @@ class NotionAutomation:
         self.update_Schedule()
 
         # Updates & Creates Tasks from Google Calendar API
-        self.update_schedule_calendar()
+        #self.update_schedule_calendar()
 
         ##### Update Duration DB #####
         import notion_duration_db 
