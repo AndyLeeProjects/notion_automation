@@ -14,7 +14,7 @@ from myPackage import Read_Data as pRd
 from myPackage import std_risetime as srt
 import time
 from datetime import datetime
-month_read = pRd.read_data()
+month_read = pRd.ReadData()
 
 
     

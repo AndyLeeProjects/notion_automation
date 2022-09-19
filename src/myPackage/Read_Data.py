@@ -15,7 +15,7 @@ import sys, os
 Read Files
 '''
     
-class read_data():
+class ReadData():
     
     def __init__(self):
         pass
@@ -119,7 +119,7 @@ class read_data():
 
 
     def fill_data(months_dfs, purpose):
-        all_dat = read_data.combine_dataframes(months_dfs)
+        all_dat = ReadData.combine_dataframes(months_dfs)
         
         # If the size don't match, make the difference 0
         for i in all_dat.keys():
@@ -127,7 +127,7 @@ class read_data():
                 all_dat[i] = [0]*(len(all_dat['Date'])-len(all_dat[i]))+all_dat[i]
         
         # Delete unimportant, redundant factor 
-        all_dat = read_data.DeleteUnnecessaryVar(all_dat, purpose)
+        all_dat = ReadData.DeleteUnnecessaryVar(all_dat, purpose)
         return all_dat
 
     def all_data(self, purpose):
@@ -148,7 +148,7 @@ class read_data():
                 break
             month += 1
             
-        return pd.DataFrame(read_data.fill_data(months_dfs, purpose)), months_dfs
+        return pd.DataFrame(ReadData.fill_data(months_dfs, purpose)), months_dfs
     
     def save_to_Ddrive(self, all_dat):
         # Save the data in the D drive for further statistical analysis

@@ -137,6 +137,8 @@ class NotionAutomation:
             if "Andy Lee and" in task_name_Google:
                 task_name_Google = task_name_Google.replace(" | Other", "")
                 task_name_Google = task_name_Google.replace("Andy Lee and ", "Pathrise: Meeting with ")
+                if "|" in task_name_Google:
+                    task_name_Google = task_name_Google.split("|")[0].strip(" ")
 
             # Get task duration
             task_duration = (end_hr * 60 + end_min) - (start_hr * 60 + start_min)
@@ -296,7 +298,7 @@ class NotionAutomation:
         print('Upload Completed\n\n\n\n')
         
         # Save to D Drive (if plugged in) for further statistical analysis
-        RDATA = NRD.read_data()
+        RDATA = NRD.ReadData()
         all_dat = RDATA.all_data("include date")[0]
         RDATA.save_to_Ddrive(all_dat)
         # Save another img with update_window == False in the D drive

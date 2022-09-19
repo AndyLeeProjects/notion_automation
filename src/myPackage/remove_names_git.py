@@ -71,6 +71,6 @@ def remove_names_month():
         month += 1
 
 
-mon = NRD.read_data()
+mon = NRD.ReadData()
 remove_names_all()
 remove_names_month()    
