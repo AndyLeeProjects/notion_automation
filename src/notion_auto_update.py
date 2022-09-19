@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import requests, json
 import numpy as np
 from datetime import datetime
-import sys, os
+import os
 import calendar
 import pandas as pd
 from datetime import time as time_time
