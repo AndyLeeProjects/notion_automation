@@ -320,7 +320,7 @@ class NotionAutomation:
         self.update_Schedule()
 
         # Updates & Creates Tasks from Google Calendar API
-        #self.update_schedule_calendar()
+        self.update_schedule_calendar()
 
         ##### Update Duration DB #####
         import notion_duration_db 

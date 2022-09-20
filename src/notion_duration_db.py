@@ -204,7 +204,7 @@ class Connect_Notion:
                 duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)
                 duration_df.to_csv(duration_path1)
             else:
-                if new_row['Date'][0] in list(duration_df['Date']) and new_row['fin_numTasks'][0] > duration_df['fin_numTasks'][0]:
+                if new_row['Date'][0] in list(duration_df['Date']) and int(new_row['fin_numTasks'][0]) > int(duration_df['fin_numTasks'][0]):
                     # Drop the last index & add the new row
                     duration_df = duration_df.drop([duration_df.index[-1]])
                     duration_df = pd.concat([duration_df, new_row], ignore_index = True, axis = 0)
