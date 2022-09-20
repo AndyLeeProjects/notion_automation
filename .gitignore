@@ -7,3 +7,4 @@ db.json
 secret/
 token files/
 .vscode
+token.json
