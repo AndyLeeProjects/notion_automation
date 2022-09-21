@@ -11,6 +11,7 @@ from datetime import time as time_time
 os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__))))
 from secret import secret
 from myPackage import NotionUpdate_API as N_Update
+from myPackage import notion_routine_API # Accrue morning routine data
 from myPackage import change_background as cb
 from myPackage import Monthly_Eval as pMon
 from myPackage import Read_Data as NRD

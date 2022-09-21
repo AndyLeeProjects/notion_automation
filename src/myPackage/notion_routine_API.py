@@ -5,8 +5,7 @@ Created on Mon Jun  7 13:30:44 2021
 @author: anddy
 """
 
-import requests, sys
-import numpy as np
+import sys
 from datetime import datetime, timedelta, time
 
 sys.path.append('C:\\NotionUpdate\\progress\\notion_automation')
@@ -23,7 +22,7 @@ class NotionSync:
         self.database_id = database_id
         self.token_key = token_key    
         
-        Notion = Notion.ConnectNotionDB(self.database_id, self.token_key)
+        Notion = Notion.ConnectNotion(self.database_id, self.token_key)
         self.data = Notion.retrieve_data()
         self.titles = list(self.data.keys())
 
