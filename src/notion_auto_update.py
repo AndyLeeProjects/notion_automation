@@ -143,7 +143,11 @@ class NotionAutomation:
 
             # Accumulate Duration (in case of redundancy of schedules)
             try:
-                task_duration_Google[task_name_Google] += task_duration
+                task_duration_Google[task_name_Google] = task_duration
+                # --> Need to be fixed :
+                    # the duration is updated, but it is created in a separate task
+                    # Need to create a way to bring the pageId for the updated tasks instantly
+                #task_duration_Google[task_name_Google] += task_duration
             except KeyError:
                 task_duration_Google[task_name_Google] = task_duration
 
