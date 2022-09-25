@@ -315,11 +315,18 @@ class NotionAutomation:
             return check_time >= begin_time or check_time <= end_time
     
     def execute_all(self):
-        # Update Schedule
-        self.update_Schedule()
 
-        # Updates & Creates Tasks from Google Calendar API
-        self.update_schedule_calendar()
+        # Check if the schedule is fixed
+        ScheduleFix = ConnectNotion(secret.notion_schedule_fix("database_id"), self.token_key)
+        sf_data = ScheduleFix.retrieve_data()
+        if sf_data["Fixed"].iloc[0] == True:
+            pass
+        else:
+            # Update Schedule
+            self.update_Schedule()
+
+            # Updates & Creates Tasks from Google Calendar API
+            self.update_schedule_calendar()
 
         ##### Update Duration DB #####
         import notion_duration_db 
