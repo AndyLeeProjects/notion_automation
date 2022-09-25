@@ -87,7 +87,7 @@ class NotionSync:
                 routine = pd.concat([routine, new_row], ignore_index = True, axis = 0)
                 routine.to_csv(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv', encoding='utf-8')
         else:
-            if new_row['Date'][0] in list(routine['Date']) and total_checked > routine_total_checked:
+            if new_row['Date'][0] in list(routine['Date']) and routine_total_checked > total_checked:
                 routine = routine.drop([routine.index[-1]])
             # Add the created row to existing csv file
             routine = pd.concat([routine, new_row], ignore_index = True, axis = 0)
@@ -95,7 +95,7 @@ class NotionSync:
             os.remove(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv')
             # Save a csv file to replace the old one
             routine.to_csv(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv', encoding='utf-8')
-            try:            
+            try:
                 routine.to_csv(r'D:\Spring 2022\Project\morning_routine.csv')
                 routine.to_csv(r'D:\Personal\progress\Data\morning_routine.csv')
                 routine.to_csv(r'D:\Personal\progress\notion_automation\Data\morning_routine.csv')
@@ -124,11 +124,3 @@ token_key = secret.notion_API("token_key")
 
 nsync = NotionSync(database_id, token_key)
 nsync.execute_all()
-
-
-
-
-
-
-
-
