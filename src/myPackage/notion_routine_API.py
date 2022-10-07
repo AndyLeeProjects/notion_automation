@@ -83,7 +83,7 @@ class NotionSync:
             pass
         elif NotionSync.is_time_between(time(6,00),time(11,59)) == True:
                 # Drop the last index & add the new row
-                routine = routine.drop([routine.index[-1]])
+                # routine = routine.drop([routine.index[-1]])
                 routine = pd.concat([routine, new_row], ignore_index = True, axis = 0)
                 routine.to_csv(r'C:\NotionUpdate\progress\notion_automation\Data\morning_routine.csv', encoding='utf-8')
         else:
